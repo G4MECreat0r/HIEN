@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>飛燕 HIEN</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#d6dfd8;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#151922}
+canvas{display:block;width:100%;height:100%}
+#hud{position:fixed;inset:0;pointer-events:none;padding:calc(16px + env(safe-area-inset-top,0px)) 20px 20px}
+#time{font-size:34px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+#spd{font-size:13px;margin-top:2px}
+#pips{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);display:flex;gap:8px}
+.pip{width:34px;height:7px;background:#151922;transform:skewX(-30deg);transition:opacity .15s,background .15s}
+.pip.off{opacity:.18}
+#dot{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;background:#151922;border-radius:50%}
+#ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(21,25,34,.82);color:#ecebe4;cursor:pointer}
+#card{max-width:460px;padding:28px}
+h1{margin:0 0 6px;font-size:56px;line-height:1;font-weight:900;letter-spacing:.12em}
+#card p{margin:0 0 18px;font-size:15px;line-height:1.7}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 20px;font-size:14px}
+dt{font-weight:700;color:#f2c230}dd{margin:0}
+#go{font-size:16px;font-weight:700;background:#f2c230;color:#151922;padding:10px 18px;display:inline-block}
+#ov{z-index:10}
+body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#tc{display:none}
+body.touch #tc{display:block}
+body.touch dl{display:none}
+.tp{display:none}
+body.touch .tp{display:block}
+body.touch #card{padding:10px 24px}
+body.touch h1{font-size:38px}
+#sz{position:fixed;left:0;bottom:0;width:42%;height:75%}
+#lz{position:fixed;right:0;top:0;width:58%;height:100%}
+#base{position:fixed;display:none;width:116px;height:116px;margin:-58px 0 0 -58px;border:3px solid #151922;border-radius:50%;opacity:.55}
+#knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;background:#151922;border-radius:50%}
+.tb{position:fixed;display:flex;align-items:center;justify-content:center;font-weight:900;color:#151922;background:rgba(236,235,228,.72);border:3px solid #151922;border-radius:50%;opacity:.85}
+.tb:active{background:#f2c230}
+#bJ{right:calc(26px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));width:92px;height:92px;font-size:17px}
+#bD{right:calc(130px + env(safe-area-inset-right,0px));bottom:calc(30px + env(safe-area-inset-bottom,0px));width:72px;height:72px;font-size:13px}
+#bH{right:calc(36px + env(safe-area-inset-right,0px));bottom:calc(132px + env(safe-area-inset-bottom,0px));width:72px;height:72px;font-size:15px}
+#msg{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-size:26px;font-weight:900;letter-spacing:.1em;color:#2f46d8;opacity:0;transition:opacity .25s}
+#hint{position:absolute;left:50%;top:58%;transform:translateX(-50%);font-size:14px;font-weight:700;background:#f2c230;padding:5px 12px;opacity:0;transition:opacity .15s;white-space:nowrap}
+#bS{right:calc(128px + env(safe-area-inset-right,0px));bottom:calc(112px + env(safe-area-inset-bottom,0px));width:62px;height:62px;font-size:13px}
+#rot{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:#151922;color:#ecebe4;font-size:20px;font-weight:700;text-align:center;line-height:1.8}
+@media (orientation:portrait){body.touch #rot{display:flex}}
+</style></head><body>
+<div id="hud"><div id="time">0.00</div><div id="spd"></div><div id="dot"></div><div id="msg"></div><div id="hint">錨をロック中：長押しで引き寄せ（クリック / E / 錨ボタン）</div><div id="pips"><div class="pip"></div><div class="pip"></div></div></div>
+<div id="ov"><div id="card">
+<h1>飛燕</h1>
+<p>止まったら落ちる。壁を蹴り、空を引き寄せ、塔の頂点まで最速で駆け抜けろ。</p>
+<p>壁でも足場でも、狙った場所にワイヤーを撃てる。黄色い結晶は吸着ポイント。ワイヤーは巻き取りながら振り子のように振れ、離した瞬間に勢いのまま飛び出す。</p>
+<p class="tp">ダッシュ直後に「跳ぶ」で加速ジャンプ。左で移動、右スワイプで視点。「ワイヤー」を押し続けると、狙った壁や足場に刺さって巻き取り・スイングできる。「滑る」でスライディング。</p>
+<dl><dt>WASD</dt><dd>移動</dd><dt>Space</dt><dd>ジャンプ（空中でもう一回／壁で蹴り上がり）</dd><dt>Shift</dt><dd>エアダッシュ（視線方向・2回、着地で回復）。ダッシュ中か直後に Space で加速ジャンプ</dd><dt>左クリック / E</dt><dd>立体機動：狙った壁・足場にワイヤー射出。押し続けて巻き取り・スイング、離して射出</dd><dt>C / Ctrl</dt><dd>スライディング（走り中、空中で押したまま着地でも発動。スライド中ジャンプで加速）</dd><dt>R</dt><dd>最初から</dd></dl>
+<span id="go">クリックで開始</span></div></div>
+<div id="tc"><div id="sz"></div><div id="lz"></div><div id="base"><div id="knob"></div></div><div class="tb" id="bJ">跳ぶ</div><div class="tb" id="bD">ダッシュ</div><div class="tb" id="bH" style="font-size:12px">ワイヤー</div><div class="tb" id="bS">滑る</div></div>
+<div id="rot"><div>端末を横向きにしてください<br>画面の向きのロックも解除してください</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const INK=0x151922,BONE=0xecebe4,BLUE=0x2f46d8,YEL=0xf2c230,SKY=0xd6dfd8;
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+document.body.prepend(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(SKY);S.fog=new THREE.Fog(SKY,40,190);
+const C=new THREE.PerspectiveCamera(78,1,.1,400);C.rotation.order='YXZ';
+function rs(){R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}
+addEventListener('resize',rs);rs();
+S.add(new THREE.HemisphereLight(0xffffff,0x8d9a94,.95));
+const sun=new THREE.DirectionalLight(0xffffff,.7);sun.position.set(30,60,20);S.add(sun);
+const mats={bone:new THREE.MeshLambertMaterial({color:BONE}),ink:new THREE.MeshLambertMaterial({color:INK}),blue:new THREE.MeshLambertMaterial({color:BLUE})};
+const lines={bone:new THREE.LineBasicMaterial({color:BONE}),ink:new THREE.LineBasicMaterial({color:INK})};
+const boxes=[],anchors=[];
+function box(cx,top,cz,w,h,d,m,l){
+  const g=new THREE.BoxGeometry(w,h,d),me=new THREE.Mesh(g,mats[m]);
+  me.position.set(cx,top-h/2,cz);S.add(me);
+  const e=new THREE.LineSegments(new THREE.EdgesGeometry(g),lines[l]);e.position.copy(me.position);S.add(e);
+  boxes.push({x0:cx-w/2,x1:cx+w/2,y0:top-h,y1:top,z0:cz-d/2,z1:cz+d/2});
+}
+// 墨の海
+const sea=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshBasicMaterial({color:INK}));
+sea.rotation.x=-Math.PI/2;S.add(sea);
+// コース生成
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+const rr=(a,b)=>a+(b-a)*rnd();
+const cps=[];let goal;
+(function(){
+  let x=0,top=0,z=0,d=10;
+  box(0,top,0,10,2,10,'bone','ink');cps.push({x:0,y:0,z:0});
+  const N=26;
+  for(let i=1;i<=N;i++){
+    const last=i===N,g=Math.min(4+i*.38,13.5),w=last?13:rr(5.5,9),nd=last?13:rr(7,10);
+    const nz=z-d/2-g-nd/2,nx=x+rr(-7,7),nt=top+rr(-2,3.4);
+    const cp=i%4===0||last;
+    box(nx,nt,nz,w,2,nd,cp?'blue':'bone',cp?'bone':'ink');
+    if(g>9){const a=new THREE.Mesh(new THREE.OctahedronGeometry(.7),new THREE.MeshLambertMaterial({color:YEL,emissive:0x3a2d00}));
+      a.position.set((x+nx)/2,Math.max(top,nt)+7,(z-d/2+nz+nd/2)/2);a.add(new THREE.Mesh(new THREE.TorusGeometry(2.2,.09,6,28),new THREE.MeshBasicMaterial({color:YEL})));a.scale.setScalar(1.3);S.add(a);anchors.push(a);}
+    if(i%3===2&&!last){box(nx+(nx>x?1:-1)*(w/2+3),nt+15,nz,1.6,17,rr(8,12),'ink','bone')}
+    if(cp&&!last)cps.push({x:nx,y:nt,z:nz});
+    x=nx;top=nt;z=nz;d=nd;
+  }
+  goal={x,y:top,z};
+  for(let k=0;k<3;k++){const r=new THREE.Mesh(new THREE.TorusGeometry(4.5-k*1.2,.25,8,40),mats.blue);r.position.set(x,top+5,z);S.add(r)}
+})();
+const killY=-30;
+// 錨ライン
+const hookLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:INK}));
+hookLine.frustumCulled=false;hookLine.visible=false;S.add(hookLine);
+// 状態
+const P={x:0,y:0,z:0,vx:0,vy:0,vz:0},HW=.35;let HH=1.8;
+let sliding=false,touchSlide=false,eyeH=1.6,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=1,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0;
+let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78;
+const keys={};
+const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
+function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;cp=0;t=0;running=false;finished=false;yaw=0;pitch=0;dashes=2;airJump=1}
+function respawn(){const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;P.vx=P.vy=P.vz=0;dashT=0;hookT=null}
+reset();
+// 入力
+const ov=$('ov');
+function begin(){started=true;ov.style.display='none';
+  if(isTouch){try{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d)}catch(e){}
+    try{screen.orientation.lock('landscape').catch(()=>{})}catch(e){}return}
+  try{R.domElement.requestPointerLock()}catch(e){}}
+ov.addEventListener('click',()=>{if(finished)reset();begin()});
+let drag=false;
+addEventListener('mousedown',e=>{if(!started)return;drag=true;if(e.button===0)hookHeld=true});
+addEventListener('mouseup',()=>{drag=false;hookHeld=false});
+addEventListener('mousemove',e=>{if(!started)return;if(document.pointerLockElement||drag){yaw-=e.movementX*.0023;pitch=Math.max(-1.5,Math.min(1.5,pitch-e.movementY*.0023))}});
+addEventListener('keydown',e=>{
+  if(e.repeat)return;keys[e.code]=true;
+  if(e.code==='Space'){jbuf=.13;e.preventDefault()}
+  if(e.code==='ShiftLeft'||e.code==='ShiftRight')dash();
+  if(e.code==='KeyE')hookHeld=true;
+  if(e.code==='KeyR'){reset()}
+});
+addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='KeyE')hookHeld=false});
+function fwd(){return[-Math.sin(yaw),-Math.cos(yaw)]}
+function dash(){
+  if(!started||dashes<=0||dashT>0)return;
+  const cf=Math.cos(pitch),dx=-Math.sin(yaw)*cf,dy=Math.sin(pitch),dz=-Math.cos(yaw)*cf;
+  dashes--;dashT=.2;dashJ=.35;airJump=1;
+  P.vx=dx*36;P.vz=dz*36;P.vy=grounded?Math.max(dy,0)*36:dy*36;
+  running=true;
+}
+// 衝突
+function hit(b){return P.x+HW>b.x0&&P.x-HW<b.x1&&P.y+HH>b.y0&&P.y<b.y1&&P.z+HW>b.z0&&P.z-HW<b.z1}
+function moveAxis(ax,dt){
+  const v='v'+ax;P[ax]+=P[v]*dt;
+  for(const b of boxes){if(!hit(b))continue;
+    if(ax==='y'){if(P.vy<0){P.y=b.y1;grounded=true}else P.y=b.y0-HH;P.vy=0}
+    else{const lo=ax==='x'?b.x0:b.z0,hi=ax==='x'?b.x1:b.z1;
+      if(P[v]>0){P[ax]=lo-HW-.001;} else {P[ax]=hi+HW+.001}
+      if(!grounded){wallT=.15;wnx=ax==='x'?(P[v]>0?-1:1):0;wnz=ax==='z'?(P[v]>0?-1:1):0}
+      P[v]*=.0}
+  }
+}
+// タッチ操作
+const isTouch=matchMedia('(pointer:coarse)').matches||('ontouchstart' in window);
+if(isTouch)document.body.classList.add('touch');
+const joy={x:0,y:0};
+(function(){
+  const sz=$('sz'),lz=$('lz'),base=$('base'),knob=$('knob');
+  const P0={passive:false};
+  const find=(e,id)=>[...e.changedTouches].find(t=>t.identifier===id);
+  let sid=null,sx=0,sy=0,lid=null,lx=0,ly=0;
+  sz.addEventListener('touchstart',e=>{e.preventDefault();if(sid!==null)return;const t=e.changedTouches[0];sid=t.identifier;sx=t.clientX;sy=t.clientY;base.style.left=sx+'px';base.style.top=sy+'px';base.style.display='block';knob.style.transform='none'},P0);
+  sz.addEventListener('touchmove',e=>{e.preventDefault();const t=find(e,sid);if(!t)return;const dx=t.clientX-sx,dy=t.clientY-sy,l=Math.hypot(dx,dy)||1,k=Math.min(1,l/55);
+    joy.x=dx/l*k;joy.y=-dy/l*k;knob.style.transform='translate('+(dx/l*k*40)+'px,'+(dy/l*k*40)+'px)'},P0);
+  const se=e=>{e.preventDefault();if(!find(e,sid))return;sid=null;joy.x=joy.y=0;base.style.display='none'};
+  sz.addEventListener('touchend',se,P0);sz.addEventListener('touchcancel',se,P0);
+  lz.addEventListener('touchstart',e=>{e.preventDefault();if(lid!==null)return;const t=e.changedTouches[0];lid=t.identifier;lx=t.clientX;ly=t.clientY},P0);
+  lz.addEventListener('touchmove',e=>{e.preventDefault();const t=find(e,lid);if(!t)return;
+    yaw-=(t.clientX-lx)*.0055;pitch=Math.max(-1.5,Math.min(1.5,pitch-(t.clientY-ly)*.0055));lx=t.clientX;ly=t.clientY},P0);
+  const le=e=>{e.preventDefault();if(find(e,lid))lid=null};
+  lz.addEventListener('touchend',le,P0);lz.addEventListener('touchcancel',le,P0);
+  const btn=(id,down,up)=>{const b=$(id);b.addEventListener('touchstart',e=>{e.preventDefault();down()},P0);
+    const u=e=>{e.preventDefault();up&&up()};b.addEventListener('touchend',u,P0);b.addEventListener('touchcancel',u,P0)};
+  btn('bJ',()=>{jbuf=.13});btn('bS',()=>{touchSlide=true},()=>{touchSlide=false});btn('bD',dash);btn('bH',()=>{hookHeld=true},()=>{hookHeld=false});
+})();
+// 更新
+function rayBox(ox,oy,oz,dx,dy,dz,b){let t0=0,t1=75;
+  for(const[o,d,lo,hi]of[[ox,dx,b.x0,b.x1],[oy,dy,b.y0,b.y1],[oz,dz,b.z0,b.z1]]){
+    if(Math.abs(d)<1e-6){if(o<lo||o>hi)return null}
+    else{let a=(lo-o)/d,c=(hi-o)/d;if(a>c){const k=a;a=c;c=k}t0=Math.max(t0,a);t1=Math.min(t1,c);if(t0>t1)return null}}
+  return t0>0?t0:null}
+let mt=0;function showMsg(s){const m=$('msg');m.textContent=s;m.style.opacity=1;clearTimeout(mt);mt=setTimeout(()=>m.style.opacity=0,700)}
+function step(dt){
+  if(!started||finished)return;
+  if(isTouch&&innerHeight>innerWidth)return;
+  jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;
+  const[fx,fz]=fwd(),rx=Math.cos(yaw),rz=-Math.sin(yaw);
+  let ix=Math.max(-1,Math.min(1,(keys.KeyD?1:0)-(keys.KeyA?1:0)+joy.x)),iy=Math.max(-1,Math.min(1,(keys.KeyW?1:0)-(keys.KeyS?1:0)+joy.y));
+  if(Math.hypot(ix,iy)<.12){ix=0;iy=0}
+  if(ix||iy||jbuf>0.0)running=true;
+  if(running)t+=dt;
+  let wx=fx*iy+rx*ix,wz=fz*iy+rz*ix;const wl=Math.hypot(wx,wz);if(wl>0){wx/=wl;wz/=wl}
+  const dashing=dashT>0;
+  {const want=keys.KeyC||keys.ControlLeft||touchSlide,hs=Math.hypot(P.vx,P.vz);
+   if(want&&grounded&&hs>5&&!sliding){sliding=true;const f=Math.min(hs*1.2,25)/hs;P.vx*=f;P.vz*=f;showMsg('スライディング')}
+   else if(sliding&&(!want||hs<3.5||!grounded)){HH=1.8;if(boxes.some(hit))HH=1.0;else sliding=false}
+   if(sliding)HH=1.0}
+  if(!dashing){
+    if(grounded){const f=Math.max(0,1-(sliding?1.1:9)*dt);P.vx*=f;P.vz*=f}
+    else{const f=Math.max(0,1-.25*dt);P.vx*=f;P.vz*=f}
+    if(wl>0){const acc=grounded?(sliding?8:90):36,tgt=14,cur=P.vx*wx+P.vz*wz,add=Math.min(Math.max(tgt-cur,0),acc*dt);P.vx+=wx*add;P.vz+=wz*add}
+    // 重力（壁に張り付くと緩やか）
+    const onWall=wallT>0&&!grounded&&P.vy<0;
+    P.vy-=(onWall?7:32)*dt;if(onWall&&P.vy<-4)P.vy=-4;
+  }
+  if(grounded){coyote=.1;airJump=1;if(dashT<=0)dashes=2}
+  // ジャンプ
+  if(jbuf>0){
+    if(dashJ>0){const h=Math.hypot(P.vx,P.vz)||1,f=Math.min(h*1.1,27);P.vx*=f/h;P.vz*=f/h;P.vy=13.5;dashT=0;dashJ=0;jbuf=0;coyote=0;grounded=false;showMsg('ダッシュジャンプ！')}
+    else if(coyote>0){P.vy=12.5;jbuf=0;coyote=0;grounded=false;if(sliding){const h=Math.hypot(P.vx,P.vz)||1,f=Math.min(h*1.12,26)/h;P.vx*=f;P.vz*=f;showMsg('スライドジャンプ！')}}
+    else if(wallT>0){P.vx=wnx*13+P.vx*.3;P.vz=wnz*13+P.vz*.3;P.vy=13;jbuf=0;wallT=0;airJump=1}
+    else if(airJump>0){P.vy=12;airJump--;jbuf=0;const f=Math.hypot(P.vx,P.vz);if(wl>0&&f<14){P.vx=wx*14;P.vz=wz*14}}
+  }
+  // 錨
+  hookLine.visible=false;let tgt=null;
+  const cf=Math.cos(pitch),cx=-Math.sin(yaw)*cf,cy=Math.sin(pitch),cz=-Math.cos(yaw)*cf,ex=P.x,ey=P.y+1.6,ez=P.z;
+  let best=.9;
+  for(const a of anchors){a.rotation.y+=dt;a.scale.setScalar(1);
+    const dx=a.position.x-ex,dy=a.position.y-ey,dz=a.position.z-ez,l=Math.hypot(dx,dy,dz);
+    if(l>60)continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
+  if(tgt&&!hookHeld)tgt.scale.setScalar(1.9);
+  $('hint').style.opacity=0;
+  if(hookHeld&&started){
+    if(!hookT){let H=null;
+      if(tgt)H=tgt.position.clone();
+      else{let bt=75;for(const b of boxes){const t2=rayBox(ex,ey,ez,cx,cy,cz,b);if(t2!==null&&t2<bt)bt=t2}if(bt<75)H=new THREE.Vector3(ex+cx*bt,ey+cy*bt,ez+cz*bt)}
+      if(H){hookT={position:H,L:H.distanceTo(new THREE.Vector3(ex,ey,ez))};dashes=2;airJump=1}}
+  }else hookT=null;
+  if(hookT){
+    const dx=hookT.position.x-ex,dy=hookT.position.y-ey,dz=hookT.position.z-ez,l=Math.hypot(dx,dy,dz);
+    if(l<3){P.vy=Math.max(P.vy,10);hookT=null;hookHeld=false}
+    else{const nx=dx/l,ny=dy/l,nz=dz/l;hookT.L=Math.max(2.5,Math.min(hookT.L,l)-10*dt);
+      const a=16*dt;P.vx+=nx*a;P.vy+=ny*a;P.vz+=nz*a;
+      const vn=P.vx*nx+P.vy*ny+P.vz*nz;
+      if(l>hookT.L){const c=(l-hookT.L)*Math.min(1,dt*10);P.x+=nx*c;P.y+=ny*c;P.z+=nz*c;if(vn<0){P.vx-=nx*vn;P.vy-=ny*vn;P.vz-=nz*vn}}
+      const sp=Math.hypot(P.vx,P.vy,P.vz);if(sp>34){const k=34/sp;P.vx*=k;P.vy*=k;P.vz*=k}
+      const pa=hookLine.geometry.attributes.position;pa.setXYZ(0,P.x,P.y+1.2,P.z);pa.setXYZ(1,hookT.position.x,hookT.position.y,hookT.position.z);pa.needsUpdate=true;hookLine.visible=true}
+  }
+  if(dashing&&dashT-dt<=0){const s=Math.hypot(P.vx,P.vy,P.vz);if(s>22){const k=22/s;P.vx*=k;P.vy*=k;P.vz*=k}}
+  // 移動
+  grounded=false;
+  moveAxis('x',dt);moveAxis('z',dt);moveAxis('y',dt);
+  if(grounded)wallT=0;
+  wallSide=wallT>0?(wnx*rx+wnz*rz):0;
+  // チェックポイント
+  for(let i=cp+1;i<cps.length;i++){const c=cps[i];if(Math.abs(P.x-c.x)<5&&Math.abs(P.z-c.z)<5&&Math.abs(P.y-c.y)<1.2){cp=i}}
+  if(P.y<killY)respawn();
+  if(Math.hypot(P.x-goal.x,P.z-goal.z)<6&&Math.abs(P.y-goal.y)<1.5)finish();
+}
+function finish(){
+  finished=true;let best=null;
+  try{best=parseFloat(localStorage.getItem('hien-best'));if(!best||t<best){localStorage.setItem('hien-best',t.toFixed(2));best=t}}catch(e){best=best||t}
+  $('card').innerHTML='<h1>到達</h1><p style="font-size:40px;font-weight:700;margin-bottom:6px">'+t.toFixed(2)+' 秒</p><p>自己ベスト '+best.toFixed(2)+' 秒。もっと削れる。</p><span id="go">クリックでもう一度</span>';
+  ov.style.display='flex';document.exitPointerLock&&document.exitPointerLock();
+}
+// ループ
+let last=performance.now();
+function loop(now){
+  let dt=Math.min((now-last)/1000,.05);last=now;
+  const n=Math.ceil(dt/.0167)||1;for(let i=0;i<n;i++)step(dt/n);
+  const sp=Math.hypot(P.vx,P.vz);
+  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
+  roll+=((-wallSide*.16)-roll)*Math.min(1,dt*10);
+  eyeH+=((sliding?.85:1.6)-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);C.rotation.set(pitch,yaw,roll);
+  $('time').textContent=t.toFixed(2);$('spd').textContent=Math.round(sp*3.6)+' km/h';
+  pips.forEach((p,i)=>{p.classList.toggle('off',i>=dashes);p.style.background=i<dashes?'#2f46d8':'#151922'});
+  R.render(S,C);requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script></body></html>
