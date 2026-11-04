@@ -478,13 +478,14 @@ const AB=[
 {id:8,t:'a',r:2,n:'ワイヤーフィーバー',d:'6秒間 ワイヤーが強化（CT 24秒）',dur:6,cd:24,m:{hk:1.4,hcap:1.12,rel:1.25}},
 {id:9,t:'a',r:2,n:'疾空連舞',d:'6秒間 ダッシュ無制限＆距離 +15％（CT 26秒）',dur:6,cd:26,m:{dd:1.15,dv:1.08},inf:1},
 {id:10,t:'a',r:3,n:'神速',d:'【最強】6秒間 全能力 +25％前後。ダッシュ無制限（CT 30秒）',dur:6,cd:30,m:{spd:1.25,run:1.25,dv:1.25,dd:1.2,air:1.25,hk:1.25,hcap:1.12,g:.88,ha:1.25,wk:1.12},inf:1},
-{id:11,t:'a',r:4,admin:1,fx:'bh',n:'ブラックホール',d:'【管理者】ゴールの90m以内で発動：ゴール上空に漆黒の渦が開き、あなたを一気にゴールまで吸い込む（CT 10秒）',dur:2.6,cd:10,m:{}},
-{id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】6秒間 時を止める。足場・レーザー・落石・風・ボスが静止し、動けるのはあなただけ（CT 12秒）',dur:6,cd:12,m:{}}];
+{id:11,t:'a',r:4,admin:1,fx:'bh',n:'ブラックホール',d:'【管理者】どこからでも発動：ゴール上空に漆黒の渦が開き、あなたを一気にゴールまで吸い込む（制限なし）',dur:2.6,cd:0,m:{}},
+{id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】時を止める。足場・レーザー・落石・風・ボスが静止し、タイマーも止まる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{}}];
 const abOk=i=>!!AB[i]&&(abOwn.has(i)||(ADMIN&&!!AB[i].admin));
 let apity=ld('hien-apity',0),abOwn=new Set(ld('hien-abown',[])),eqP=ld('hien-eqp',-1),eqA=ld('hien-eqa',-1),PA=null,AA=null,abT=0,abCD=0;
 function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}}
 function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
-function useAb(){if(!started||finished||!AA||abT>0||abCD>0||BH)return;
+function useAb(){if(started&&!finished&&AA&&AA.fx==='ts'&&abT>0){abT=0;tsOn(false);return}
+  if(!started||finished||!AA||abT>0||abCD>0||BH)return;
   if(AA.fx==='bh'){if(!startBH())return;admUsed=true;abT=AA.dur;abCD=AA.cd;return}
   if(AA.fx==='ts'){admUsed=true;tsOn(true)}
   abT=AA.dur;abCD=AA.cd;recalc();if(!AA.fx)showMsg(AA.n+'！')}
@@ -693,7 +694,7 @@ function step(dt){
   if(isTouch&&innerHeight>innerWidth)return;
   const tfz=!!(AA&&AA.fx==='ts'&&abT>0),wdt=tfz?0:dt;
   jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;boostT-=dt;padCD-=dt;fly-=dt;gt+=wdt;abT-=dt;abCD-=dt;recalc();
-  if(tfz){if(abT<=0)tsOn(false);else if(abT<1.4)G('tsv').classList.add('warn')}
+  if(tfz){if(abT<=0)tsOn(false);}
   if(BH){stepBH(dt);return}landT=grounded?landT+dt:0;
   // 動く足場・崩れる足場
   const ride=P.ride;P.ride=null;
@@ -707,7 +708,7 @@ function step(dt){
   let ix=Math.max(-1,Math.min(1,(keys.KeyD?1:0)-(keys.KeyA?1:0)+joy.x)),iy=Math.max(-1,Math.min(1,(keys.KeyW?1:0)-(keys.KeyS?1:0)+joy.y));
   if(Math.hypot(ix,iy)<.12){ix=0;iy=0}
   if(ix||iy||jbuf>0.0||hookT||Math.hypot(P.vx,P.vz)>1)running=true;
-  if(running){t+=dt;const ri=Math.floor(t/.05);while(rec.length<ri*4+4)rec.push(Math.round(P.x*10),Math.round(P.y*10),Math.round(P.z*10),Math.round(yaw*100))}
+  if(running){t+=tfz?0:dt;const ri=Math.floor(t/.05);while(rec.length<ri*4+4)rec.push(Math.round(P.x*10),Math.round(P.y*10),Math.round(P.z*10),Math.round(yaw*100))}
   if(BOSS&&running){BOSS.s+=(7.5+5*Math.max(0,Math.min(1,BOSS.s/PS[NP-1])))*(tfz?0:dt);updBoss(tfz?0:dt)}
   let wx=fx*iy+rx*ix,wz=fz*iy+rz*ix;const wl=Math.hypot(wx,wz);if(wl>0){wx/=wl;wz/=wl}
   if(grounded&&wl>0)runT=Math.min(runT+dt*E.run,2.5);else if(grounded)runT=Math.max(0,runT-dt*3);
@@ -797,7 +798,7 @@ for(let i=0;i<BN;i++)bhP.push({r:1.6+Math.random()*3.2,a:Math.random()*6.283,y:(
 const bhGeo=new THREE.BufferGeometry();bhGeo.setAttribute('position',new THREE.BufferAttribute(bhPos,3));bhGeo.setAttribute('color',new THREE.BufferAttribute(bhCol,3));
 const bhPts=new THREE.Points(bhGeo,new THREE.PointsMaterial({size:.55,map:glowTex,vertexColors:true,alphaTest:0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,sizeAttenuation:true}));bhPts.frustumCulled=false;bhTilt.add(bhPts);
 let bhK=0,bhShow=false,bhTime=0;
-function startBH(){const d=bhDist();if(d>90){showMsg('ゴールが遠い（90m以内で発動）');return false}
+function startBH(){
   const ex=goal.x,ey=goal.y+5.5,ez=goal.z,sx=P.x,sy=P.y+.9,sz=P.z,dx=ex-sx,dy=ey-sy,dz=ez-sz,L=Math.hypot(dx,dy,dz)||1;
   let ux=-dz,uz=dx;const ul=Math.hypot(ux,uz)||1;ux/=ul;uz/=ul;const u1=[ux,0,uz];
   const nx=dx/L,ny=dy/L,nz=dz/L,v2=[ny*u1[2]-nz*u1[1],nz*u1[0]-nx*u1[2],nx*u1[1]-ny*u1[0]];
@@ -850,7 +851,7 @@ function loop(now){
   roll+=((-wallSide*.16)-roll)*Math.min(1,dt*10);
   eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);if(BH){const k=.05+.5*Math.min(1,BH.t/BH.T);C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}C.rotation.set(pitch,yaw,roll);if(!(AA&&AA.fx==='ts'&&abT>0)&&!paused)vt+=dt;bhFx(paused?0:dt);updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
   $('time').textContent=t.toFixed(2);$('spd').innerHTML='<b>'+Math.round(sp*3.6)+'</b><small>km/h</small><i>'+SG.n+' ／ '+E.n+(MS.has('O')?' ／ ワンミス':'')+'</i>';
-  G('abh').textContent=AA?(abT>0?AA.n+' 発動中 '+abT.toFixed(1)+'s':abCD>0?AA.n+' CT '+Math.ceil(abCD)+'s':'[Q] '+AA.n+' 準備完了'+(AA.fx==='bh'?(bhDist()<=90?'　● 射程内':'　○ ゴールまで '+Math.round(bhDist())+'m'):'')):'';G('fx').classList.toggle('on',abT>0);
+  G('abh').textContent=AA?(abT>1e8?AA.n+' 発動中（Qで解除）':abT>0?AA.n+' 発動中 '+abT.toFixed(1)+'s':abCD>0?AA.n+' CT '+Math.ceil(abCD)+'s':'[Q] '+AA.n+' 準備完了'+(AA.fx==='bh'?'　ゴールまで '+Math.round(bhDist())+'m':'')):'';G('fx').classList.toggle('on',abT>0);
   G('zn').textContent=znT;updGhost();
   if(BOSS&&BOSS.p){const b=BOSS.p,gp=Math.max(0,(P.x-b.x)*b.dx+(P.z-b.z)*b.dz),dg=gp<22&&started&&!finished,e=G('bss');e.style.display=finished?'none':'block';e.textContent='◀ 巨像　'+Math.round(gp)+' m';e.classList.toggle('dg',dg);G('fx').classList.toggle('dg',dg)}
   pips.forEach((p,i)=>{p.classList.toggle('off',i>=dashes);p.style.background=i<dashes?'#2f46d8':(NIGHT?'#ecebe4':'#151922')});
