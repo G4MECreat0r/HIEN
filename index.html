@@ -139,9 +139,23 @@ body.touch .sc span{font-size:24px}body.touch .sc{padding:12px 14px}
 #bss.dg{background:#e23a52}
 #fx.dg{box-shadow:inset 0 0 160px 30px rgba(226,58,82,.5)}
 body.night #hud{color:#ecebe4}body.night #dot{background:#ecebe4}body.night .pip{background:#ecebe4}body.night #msg{color:#f2c230}
+#bhv{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 18%,rgba(40,0,80,.5) 62%,rgba(0,0,0,.92) 100%)}
+#bhv.on{opacity:1}
+#bhv::before{content:'';position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,rgba(255,150,50,0) 0 10deg,rgba(255,180,90,.20) 10deg 12deg,rgba(130,70,255,0) 12deg 20deg,rgba(90,200,255,.16) 20deg 21.5deg,rgba(0,0,0,0) 21.5deg 30deg);-webkit-mask-image:radial-gradient(circle,transparent 6%,#000 55%);mask-image:radial-gradient(circle,transparent 6%,#000 55%);animation:bhs 1.1s linear infinite}
+@keyframes bhs{to{transform:rotate(-360deg)}}
+#bhf{position:fixed;inset:0;pointer-events:none;background:#fff;opacity:0}
+#bhf.go{animation:bhfl 1s ease-out}
+@keyframes bhfl{0%{opacity:1}100%{opacity:0}}
+#tsv{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 35%,rgba(20,30,90,.55) 100%);mix-blend-mode:multiply}
+#tsv.on{opacity:1}#tsv.warn{animation:tsw .3s steps(2) infinite}
+@keyframes tsw{50%{opacity:.25}}
+#tsr{position:fixed;left:50%;top:50%;width:80px;height:80px;margin:-40px;border:5px solid #fff;border-radius:50%;pointer-events:none;opacity:0}
+#tsr.go{animation:tsring .9s ease-out}
+@keyframes tsring{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(28)}}
+body.ts canvas{filter:grayscale(1) contrast(1.25)}body.tsx canvas{filter:invert(1) contrast(1.2)}
 </style></head><body>
 <div id="hud"><div id="time">0.00</div><div id="spd"></div><div id="dot"></div><div id="msg"></div><div id="hint">錨をロック中：長押しで引き寄せ（クリック / E / 錨ボタン）</div><div id="zn"></div><div id="bss"></div><div id="abh"></div><div id="fx"></div><div id="pips"><div class="pip"></div><div class="pip"></div></div></div>
-<div id="pb">Ⅱ</div><div id="ps"><h2>PAUSE</h2><div class="pbt y" id="pr">再開</div><div class="pbt" id="pt">やり直し</div><div class="pbt d" id="ph">ホームへ戻る</div></div>
+<div id="bhv"></div><div id="tsv"></div><div id="tsr"></div><div id="bhf"></div><div id="pb">Ⅱ</div><div id="ps"><h2>PAUSE</h2><div class="pbt y" id="pr">再開</div><div class="pbt" id="pt">やり直し</div><div class="pbt d" id="ph">ホームへ戻る</div></div>
 <div id="ov"><div id="side"><div id="ttl">飛燕</div><div id="sub">HIEN</div></div>
 <div id="main"><div id="top"><div id="tabs"><span class="tab on" data-p="p1">ステージ</span><span class="tab" data-p="p2">キャラ</span><span class="tab" data-p="p3">アビリティ</span><span class="tab" data-p="p4">操作</span></div><span id="gb">ガチャ ◆<span id="coin">0</span></span></div><div id="body"><div id="p1" class="pane"><p id="lead">止まったら落ちる。壁を蹴り、空を引き寄せ、最速で駆け抜けろ。RANK B以上で次のステージが開く。</p><div id="stages"></div><div id="tgt"></div><div class="lbl2">MODIFIER　付けるほどコイン倍率UP</div><div id="mods"></div><div id="mtot"></div></div><div id="p2" class="pane"><div id="chars"></div><div id="cd"></div><div id="cs"></div></div><div id="p3" class="pane"><div id="abs"></div><span id="ab2">アビリティ編成</span><p class="note">アビリティはガチャで入手します。</p></div><div id="p4" class="pane"><p>壁でも足場でも、狙った場所にワイヤーを撃てる。黄色い結晶は吸着ポイント。ワイヤーは巻き取りながら振り子のように振れ、離した瞬間に勢いのまま飛び出す。</p><p>青いパッドは加速、黄色いパッドはジャンプ台。橙の足場は乗ると崩れ、黒い足場は動く。コースのどこかに、隠された大ジャンプの道がある。見つければ一気に進める。</p><p>モディファイア：ステージ画面で、風・ワイヤー禁止・回転壁・夜・レーザー／落石・ワンミス即やり直しを好きに足せる。付けた分だけクリア時のコインが増える。ボスステージ「追跡」は、背後から迫る巨大な壁から逃げ切れ。ベスト更新時の走りはゴーストとして次回に再生される。</p><p class="tp">ダッシュ直後に「跳ぶ」で加速ジャンプ。左で移動、右スワイプで視点。「ワイヤー」を押し続けると、狙った壁や足場に刺さって巻き取り・スイングできる。着地の瞬間に「跳ぶ」で連続ホップ。走り続けるほど速くなる。ワイヤー中に「ダッシュ」でワイヤーダッシュ。</p><dl><dt>WASD</dt><dd>移動</dd><dt>Space</dt><dd>ジャンプ（空中でもう一回／壁で蹴り上がり）</dd><dt>Shift</dt><dd>エアダッシュ（視線方向・2回、着地で回復）。ダッシュ中か直後に Space で加速ジャンプ</dd><dt>左クリック / E</dt><dd>立体機動：狙った壁・足場にワイヤー射出。押し続けて巻き取り・スイング、離して射出</dd><dt>加速</dt><dd>走り続けるほど最高速が伸びる／着地の瞬間にSpaceで連続ホップ／ワイヤー中にShiftでワイヤーダッシュ、進行方向キーで振り子を加速、0.25秒以上掴んで離すと勢いが乗る／壁蹴りは速度を保つ</dd><dt>R</dt><dd>最初から</dd></dl></div></div><div id="act"><span id="go">START</span><a id="rnd" href="#">ランダムコース</a></div></div></div>
 <div id="tc"><div id="sz"></div><div id="lz"></div><div id="base"><div id="knob"></div></div><div class="tb" id="bJ">跳ぶ</div><div class="tb" id="bD">ダッシュ</div><div class="tb" id="bA">能力</div><div class="tb" id="bH" style="font-size:12px">ワイヤー</div></div>
@@ -162,6 +176,7 @@ let MSL=[];try{MSL=JSON.parse(localStorage.getItem('hien-mods')||'[]')}catch(e){
 if(Q.get('mods')!==null)MSL=Q.get('mods').split('');
 const MS=new Set(MSL.filter(c=>MDEF.some(m=>m[0]===c))),MOD=k=>MS.has(k);
 const MM=1+MDEF.reduce((a,m)=>a+(MS.has(m[0])?m[3]:0),0),MSIG=[...MS].sort().join(''),NIGHT=MOD('Y');
+let ADMIN=false;try{if(Q.get('admin')==='1')localStorage.setItem('hien-admin','1');if(Q.get('admin')==='0')localStorage.removeItem('hien-admin');ADMIN=localStorage.getItem('hien-admin')==='1'}catch(e){}
 let GON=true;try{GON=localStorage.getItem('hien-ghon')!=='0'}catch(e){}
 if(NIGHT)document.body.classList.add('night');
 const D={tc:0,tw:0,gv:1,va:0,wl:1,ge:4,wm:[8,12],dm:[8,12]};
@@ -462,14 +477,20 @@ const AB=[
 {id:7,t:'a',r:1,n:'無重力',d:'5秒間 重力が6割に。空中操作 +25％（CT 22秒）',dur:5,cd:22,m:{g:.6,air:1.25}},
 {id:8,t:'a',r:2,n:'ワイヤーフィーバー',d:'6秒間 ワイヤーが強化（CT 24秒）',dur:6,cd:24,m:{hk:1.4,hcap:1.12,rel:1.25}},
 {id:9,t:'a',r:2,n:'疾空連舞',d:'6秒間 ダッシュ無制限＆距離 +15％（CT 26秒）',dur:6,cd:26,m:{dd:1.15,dv:1.08},inf:1},
-{id:10,t:'a',r:3,n:'神速',d:'【最強】6秒間 全能力 +25％前後。ダッシュ無制限（CT 30秒）',dur:6,cd:30,m:{spd:1.25,run:1.25,dv:1.25,dd:1.2,air:1.25,hk:1.25,hcap:1.12,g:.88,ha:1.25,wk:1.12},inf:1}];
+{id:10,t:'a',r:3,n:'神速',d:'【最強】6秒間 全能力 +25％前後。ダッシュ無制限（CT 30秒）',dur:6,cd:30,m:{spd:1.25,run:1.25,dv:1.25,dd:1.2,air:1.25,hk:1.25,hcap:1.12,g:.88,ha:1.25,wk:1.12},inf:1},
+{id:11,t:'a',r:4,admin:1,fx:'bh',n:'ブラックホール',d:'【管理者】ゴールの90m以内で発動：ゴール上空に漆黒の渦が開き、あなたを一気にゴールまで吸い込む（CT 10秒）',dur:2.6,cd:10,m:{}},
+{id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】6秒間 時を止める。足場・レーザー・落石・風・ボスが静止し、動けるのはあなただけ（CT 12秒）',dur:6,cd:12,m:{}}];
+const abOk=i=>!!AB[i]&&(abOwn.has(i)||(ADMIN&&!!AB[i].admin));
 let apity=ld('hien-apity',0),abOwn=new Set(ld('hien-abown',[])),eqP=ld('hien-eqp',-1),eqA=ld('hien-eqa',-1),PA=null,AA=null,abT=0,abCD=0;
 function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}}
-function setEq(){PA=abOwn.has(eqP)?AB[eqP]:null;AA=abOwn.has(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
-function useAb(){if(!started||finished||!AA||abT>0||abCD>0)return;abT=AA.dur;abCD=AA.cd;recalc();showMsg(AA.n+'！')}
+function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
+function useAb(){if(!started||finished||!AA||abT>0||abCD>0||BH)return;
+  if(AA.fx==='bh'){if(!startBH())return;admUsed=true;abT=AA.dur;abCD=AA.cd;return}
+  if(AA.fx==='ts'){admUsed=true;tsOn(true)}
+  abT=AA.dur;abCD=AA.cd;recalc();if(!AA.fx)showMsg(AA.n+'！')}
 function renderAb(){
-  G('alist').innerHTML=['p','a'].map(t=>'<div class="lbl2">'+(t==='p'?'PASSIVE　常時発動':'ACTIVE　Qキー／「能力」ボタンで発動')+'</div>'+AB.filter(a=>a.t===t).map(a=>{const o=abOwn.has(a.id),eq=(t==='p'?eqP:eqA)===a.id;
-    return o?'<div class="acard'+(a.r===3?' star':'')+(eq?' eq':'')+'" data-id="'+a.id+'"><b><span style="color:'+RC[a.r]+'">'+RN[a.r]+'</span> '+a.n+'</b><small>'+a.d+'</small><em>'+(eq?'装備中（押すと外す）':'装備する')+'</em></div>'
+  G('alist').innerHTML=['p','a'].map(t=>'<div class="lbl2">'+(t==='p'?'PASSIVE　常時発動':'ACTIVE　Qキー／「能力」ボタンで発動')+'</div>'+AB.filter(a=>a.t===t&&(!a.admin||ADMIN)).map(a=>{const o=abOk(a.id),eq=(t==='p'?eqP:eqA)===a.id;
+    return o?'<div class="acard'+(a.r===3?' star':'')+(eq?' eq':'')+'" data-id="'+a.id+'"><b><span style="color:'+RC[a.r]+'">'+(a.admin?'ADMIN':RN[a.r])+'</span> '+a.n+'</b><small>'+a.d+'</small><em>'+(eq?'装備中（押すと外す）':'装備する')+'</em></div>'
       :'<div class="acard" style="border-style:dashed;border-color:#9aa5a0;color:#9aa5a0;cursor:default">？？？</div>'}).join('')).join('')}
 G('alist').onclick=e=>{const c=e.target.closest('.acard');if(!c||c.dataset.id===undefined)return;const a=AB[+c.dataset.id];
   if(a.t==='p')eqP=eqP===a.id?-1:a.id;else eqA=eqA===a.id?-1:a.id;
@@ -583,15 +604,16 @@ hookLine.frustumCulled=false;hookLine.visible=false;S.add(hookLine);
 // 状態
 const P={x:0,y:0,z:0,vx:0,vy:0,vz:0,ride:null},HW=.35;let HH=1.8;
 let eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
-let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='';
+let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='',admUsed=false,BH=null,admReady=false;
 const keys={};
 const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
-function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;P.ride=null;cp=0;t=0;running=false;finished=false;yaw=SG.yaw0||0;pitch=0;dashes=2;airJump=E.aj;boostT=0;runT=0;hop=0;abT=0;abCD=0;rec=[];if(BOSS){BOSS.s=-34;updBoss(1)}for(const R of rocks){R.st=0;R.tm=1.2+Math.random()*2;R.g.visible=false;R.mk.visible=false}
+function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;P.ride=null;cp=0;t=0;running=false;finished=false;yaw=SG.yaw0||0;pitch=0;dashes=2;airJump=E.aj;boostT=0;runT=0;hop=0;abT=0;abCD=0;rec=[];admUsed=false;BH=null;if(admReady){tsOn(false);bhFxOff()}if(BOSS){BOSS.s=-34;updBoss(1)}for(const R of rocks){R.st=0;R.tm=1.2+Math.random()*2;R.g.visible=false;R.mk.visible=false}
   for(const b of vns){b.st=0;b.tm=0;vis(b,true);b.me.material.opacity=1}}
 function respawn(){if(MS.has('O')){reset();hookT=null;dashT=0;fly=0;showMsg('ミス！最初から');return}const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;if(c.b){P.x=(c.b.x0+c.b.x1)/2;P.z=(c.b.z0+c.b.z1)/2}for(const b of vns){b.st=0;vis(b,true);b.me.material.opacity=1}if(BOSS){BOSS.s=Math.min(BOSS.s,c.s-32);updBoss(1)}P.vx=P.vy=P.vz=0;P.ride=null;dashT=0;boostT=0;runT=0;hop=0;fly=0;hookT=null}
 reset();
 // 入力
 const ov=$('ov');let paused=false;
+(function(){let n=0,tm=0;G('ttl').addEventListener('click',()=>{n++;clearTimeout(tm);tm=setTimeout(()=>n=0,1500);if(n>=7){n=0;let on=false;try{on=localStorage.getItem('hien-admin')!=='1';on?localStorage.setItem('hien-admin','1'):localStorage.removeItem('hien-admin')}catch(e){}alert(on?'管理者モード ON：アビリティ画面に「ブラックホール」「タイムスキップ」が表示されます':'管理者モード OFF');location.reload()}})})();
 function setPause(v){if(!started||finished||paused===v)return;paused=v;$('ps').style.display=v?'flex':'none';if(v){hookHeld=false;drag=false;for(const k in keys)keys[k]=false;document.exitPointerLock&&document.exitPointerLock()}else if(!isTouch){try{R.domElement.requestPointerLock()}catch(e){}}}
 $('pb').addEventListener('click',()=>setPause(true));$('pr').addEventListener('click',()=>setPause(false));
 $('pt').addEventListener('click',()=>{reset();setPause(false)});$('ph').addEventListener('click',()=>{location.href='?s='+SI+sq});
@@ -669,21 +691,24 @@ let mt=0;function showMsg(s){const m=$('msg');m.textContent=s;m.style.opacity=1;
 function step(dt){
   if(!started||finished)return;
   if(isTouch&&innerHeight>innerWidth)return;
-  jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;boostT-=dt;padCD-=dt;fly-=dt;gt+=dt;abT-=dt;abCD-=dt;recalc();landT=grounded?landT+dt:0;
+  const tfz=!!(AA&&AA.fx==='ts'&&abT>0),wdt=tfz?0:dt;
+  jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;boostT-=dt;padCD-=dt;fly-=dt;gt+=wdt;abT-=dt;abCD-=dt;recalc();
+  if(tfz){if(abT<=0)tsOn(false);else if(abT<1.4)G('tsv').classList.add('warn')}
+  if(BH){stepBH(dt);return}landT=grounded?landT+dt:0;
   // 動く足場・崩れる足場
   const ride=P.ride;P.ride=null;
   for(const b of mvs){const dx=mvBox(b,b.mv.c+Math.sin(gt*b.mv.s+b.mv.p)*b.mv.a,b.mv.ax);if(ride===b)P[b.mv.ax]+=dx}
   for(const b of vns){
-    if(b.st===2){b.tm-=dt;if(b.tm<=0){b.st=0;vis(b,true);b.me.material.opacity=1}}
+    if(b.st===2){b.tm-=wdt;if(b.tm<=0){b.st=0;vis(b,true);b.me.material.opacity=1}}
     else{if(b.st===0&&ride===b){b.st=1;b.tm=SG.va?.4:.7}
-      if(b.st===1){b.tm-=dt;b.me.material.opacity=Math.sin(gt*50)>0?1:.4;if(b.tm<=0){b.st=2;b.tm=SG.va?2.5:3;vis(b,false)}}}
+      if(b.st===1){b.tm-=wdt;b.me.material.opacity=Math.sin(gt*50)>0?1:.4;if(b.tm<=0){b.st=2;b.tm=SG.va?2.5:3;vis(b,false)}}}
   }
   const[fx,fz]=fwd(),rx=Math.cos(yaw),rz=-Math.sin(yaw);
   let ix=Math.max(-1,Math.min(1,(keys.KeyD?1:0)-(keys.KeyA?1:0)+joy.x)),iy=Math.max(-1,Math.min(1,(keys.KeyW?1:0)-(keys.KeyS?1:0)+joy.y));
   if(Math.hypot(ix,iy)<.12){ix=0;iy=0}
   if(ix||iy||jbuf>0.0||hookT||Math.hypot(P.vx,P.vz)>1)running=true;
   if(running){t+=dt;const ri=Math.floor(t/.05);while(rec.length<ri*4+4)rec.push(Math.round(P.x*10),Math.round(P.y*10),Math.round(P.z*10),Math.round(yaw*100))}
-  if(BOSS&&running){BOSS.s+=(7.5+5*Math.max(0,Math.min(1,BOSS.s/PS[NP-1])))*dt;updBoss(dt)}
+  if(BOSS&&running){BOSS.s+=(7.5+5*Math.max(0,Math.min(1,BOSS.s/PS[NP-1])))*(tfz?0:dt);updBoss(tfz?0:dt)}
   let wx=fx*iy+rx*ix,wz=fz*iy+rz*ix;const wl=Math.hypot(wx,wz);if(wl>0){wx/=wl;wz/=wl}
   if(grounded&&wl>0)runT=Math.min(runT+dt*E.run,2.5);else if(grounded)runT=Math.max(0,runT-dt*3);
   const dashing=dashT>0;
@@ -696,7 +721,7 @@ function step(dt){
     P.vy-=(onWall?7:32*SG.gv*E.g)*dt;if(onWall&&P.vy<-4)P.vy=-4;
   }
   znT='';let wd=null;for(const w of winds)if(Math.hypot(P.x-w.x,P.z-w.z)<w.r&&P.y>w.y0&&P.y<w.y1){wd=w;break}
-  if(wd){znT='風：'+wd.nm;if(!grounded&&!dashing&&fly<=0){P.vx+=wd.dx*wd.a*dt;P.vz+=wd.dz*wd.a*dt}}
+  if(wd){znT='風：'+wd.nm;if(!grounded&&!dashing&&fly<=0){P.vx+=wd.dx*wd.a*wdt;P.vz+=wd.dz*wd.a*wdt}}
   const nwz=nowires.some(z=>P.x>z.x0&&P.x<z.x1&&P.z>z.z0&&P.z<z.z1&&P.y>z.y0&&P.y<z.y1);if(nwz)znT+=(znT?'　':'')+'ワイヤー禁止区間';
   if(grounded){fly=0;coyote=.1;airJump=E.aj;if(dashT<=0)dashes=2}
   // ジャンプ
@@ -735,7 +760,7 @@ function step(dt){
   // 移動
   grounded=false;
   moveAxis('x',dt);moveAxis('z',dt);moveAxis('y',dt);
-  updSpin();for(const w of spins)spinHit(w);if(MS.has('H'))updHaz(dt);
+  updSpin();for(const w of spins)spinHit(w);if(MS.has('H'))updHaz(wdt);
   if(grounded)wallT=0;
   // パッド
   if(grounded&&padCD<=0)for(const p of pads){
@@ -753,15 +778,66 @@ function step(dt){
   if(BOSS&&running&&BOSS.p){const b=BOSS.p,gp=(P.x-b.x)*b.dx+(P.z-b.z)*b.dz;if(gp<2&&Math.hypot(P.x-b.x,P.z-b.z)<80){showMsg('喰われた！');respawn()}}
   if(Math.hypot(P.x-goal.x,P.z-goal.z)<6&&Math.abs(P.y-goal.y)<1.5)finish();
 }
+// ===== 管理者アビリティ：ブラックホール／タイムスキップ =====
+const bhDist=()=>Math.hypot(P.x-goal.x,P.z-goal.z);
+function tsOn(on){document.body.classList.toggle('ts',on);G('tsv').classList.toggle('on',on);if(!on)G('tsv').classList.remove('warn');
+  if(on){document.body.classList.add('tsx');setTimeout(()=>document.body.classList.remove('tsx'),320);const r=G('tsr');r.classList.remove('go');void r.offsetWidth;r.classList.add('go');showMsg('時よ、止まれ')}
+  else if(started&&!finished&&!paused)showMsg('時は動き出す')}
+const BHG=new THREE.Group(),BHT={value:0},BHA={value:0};BHG.visible=false;S.add(BHG);
+const bhTilt=new THREE.Group();bhTilt.rotation.x=-1.12;bhTilt.rotation.z=.25;BHG.add(bhTilt);
+const bhCore=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),new THREE.MeshBasicMaterial({color:0x000000,fog:false}));BHG.add(bhCore);
+const DISKV='varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
+const DISKF='varying vec2 vUv;uniform float uT;uniform float uA;void main(){vec2 p=vUv*2.-1.;float r=length(p);float a=atan(p.y,p.x);float in0=.30;if(r<in0||r>1.)discard;float h=1.-smoothstep(in0,1.,r);float s=sin(a*5.+r*16.-uT*6.)*.5+.5;float s2=sin(a*13.-r*34.+uT*10.)*.5+.5;float s3=sin(a*2.+uT*3.)*.5+.5;vec3 hot=mix(vec3(1.,.28,.04),vec3(1.,.95,.75),pow(h,1.6));vec3 cool=vec3(.45,.55,1.);vec3 col=mix(hot,cool,smoothstep(.55,1.,r)*.7)*(.45+s*.8+s2*.35+s3*.2);float al=smoothstep(in0,in0+.05,r)*(1.-smoothstep(.72,1.,r))*uA;gl_FragColor=vec4(col*1.1,al*.9);}';
+const bhDisk=new THREE.Mesh(new THREE.RingGeometry(.0001,1,96,1),new THREE.ShaderMaterial({uniforms:{uT:BHT,uA:BHA},vertexShader:DISKV,fragmentShader:DISKF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));bhTilt.add(bhDisk);
+const bhHalo=new THREE.Mesh(new THREE.RingGeometry(1.0,1.12,96),new THREE.MeshBasicMaterial({color:0xffe2b0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,side:THREE.DoubleSide}));BHG.add(bhHalo);
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,200,120,.9)');g.addColorStop(.25,'rgba(255,120,40,.45)');g.addColorStop(.6,'rgba(120,60,255,.18)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
+const bhGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));BHG.add(bhGlow);
+const BN=900,bhPos=new Float32Array(BN*3),bhCol=new Float32Array(BN*3),bhP=[];
+for(let i=0;i<BN;i++)bhP.push({r:1.6+Math.random()*3.2,a:Math.random()*6.283,y:(Math.random()-.5)*.5,sp:.6+Math.random()*.9});
+const bhGeo=new THREE.BufferGeometry();bhGeo.setAttribute('position',new THREE.BufferAttribute(bhPos,3));bhGeo.setAttribute('color',new THREE.BufferAttribute(bhCol,3));
+const bhPts=new THREE.Points(bhGeo,new THREE.PointsMaterial({size:.55,map:glowTex,vertexColors:true,alphaTest:0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,sizeAttenuation:true}));bhPts.frustumCulled=false;bhTilt.add(bhPts);
+let bhK=0,bhShow=false,bhTime=0;
+function startBH(){const d=bhDist();if(d>90){showMsg('ゴールが遠い（90m以内で発動）');return false}
+  const ex=goal.x,ey=goal.y+5.5,ez=goal.z,sx=P.x,sy=P.y+.9,sz=P.z,dx=ex-sx,dy=ey-sy,dz=ez-sz,L=Math.hypot(dx,dy,dz)||1;
+  let ux=-dz,uz=dx;const ul=Math.hypot(ux,uz)||1;ux/=ul;uz/=ul;const u1=[ux,0,uz];
+  const nx=dx/L,ny=dy/L,nz=dz/L,v2=[ny*u1[2]-nz*u1[1],nz*u1[0]-nx*u1[2],nx*u1[1]-ny*u1[0]];
+  BH={t:0,T:Math.min(3.1,.6+L/42),sx,sy,sz,ex,ey,ez,u1,u2:v2,a0:Math.random()*6.283};
+  BHG.position.set(ex,ey,ez);BHG.visible=true;bhShow=true;bhK=0;bhTime=0;G('bhv').classList.add('on');showMsg('ブラックホール');
+  hookT=null;dashT=0;fly=0;hookHeld=false;return true}
+function stepBH(dt){const b=BH;b.t+=dt;
+  const e=Math.max(0,Math.min(1,(b.t-.5)/(b.T-.5))),k=e*e*(1.35-.35*e),o=(1-k)*3.4,a=b.a0+e*15,ca=Math.cos(a)*o,sa=Math.sin(a)*o;
+  P.x=b.sx+(b.ex-b.sx)*k+ca*b.u1[0]+sa*b.u2[0];
+  P.y=b.sy-.9+(b.ey-b.sy)*k+ca*b.u1[1]+sa*b.u2[1];
+  P.z=b.sz+(b.ez-b.sz)*k+ca*b.u1[2]+sa*b.u2[2];
+  P.vx=P.vy=P.vz=0;P.ride=null;grounded=false;running=true;hookT=null;dashT=0;fly=0;
+  const dx=b.ex-P.x,dy=b.ey-(P.y+eyeH),dz=b.ez-P.z,h=Math.hypot(dx,dz)||1;
+  const ty=Math.atan2(-dx,-dz),dY=Math.atan2(Math.sin(ty-yaw),Math.cos(ty-yaw));yaw+=dY*Math.min(1,dt*7);
+  pitch+=(Math.max(-1.3,Math.min(1.3,Math.atan2(dy,h)))-pitch)*Math.min(1,dt*7);
+  if(b.t>=b.T){P.x=b.ex;P.y=b.ey-eyeH;P.z=b.ez;const f=G('bhf');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');BH=null;G('bhv').classList.remove('on');if(!finished)finish()}}
+function bhFxOff(){bhShow=false;BHG.visible=false;G('bhv').classList.remove('on')}
+function bhFx(dt){
+  if(!bhShow)return;bhTime+=dt;
+  if(BH)bhK=Math.min(1,BH.t/.55);else{bhK=Math.max(0,bhK-dt*2.2);if(bhK<=0){bhFxOff();return}}
+  const collapse=BH?1-Math.max(0,(BH.t-(BH.T-.3))/.3)*.7:1,sc=bhK*collapse,ease=1-Math.pow(1-Math.min(1,sc),3);
+  const R0=3.2*ease;bhCore.scale.setScalar(Math.max(.001,R0));bhHalo.scale.setScalar(Math.max(.001,R0*1.32));bhHalo.lookAt(C.position);
+  bhDisk.scale.setScalar(Math.max(.001,R0*5.2));BHT.value=bhTime;BHA.value=Math.min(1,ease*1.4);
+  bhGlow.scale.setScalar(Math.max(.001,R0*(15+3*Math.sin(bhTime*5))));bhGlow.material.opacity=.85*ease;
+  bhTilt.rotation.z=.25+Math.sin(bhTime*.8)*.08;
+  for(let i=0;i<BN;i++){const q=bhP[i];q.r-=dt*(1.2+9/(q.r+.5))*q.sp*ease;q.a+=dt*(5+24/(q.r+.5))*q.sp;
+    if(q.r<R0*1.05||q.r>R0*5.4){q.r=R0*(2.6+Math.random()*2.8);q.y=(Math.random()-.5)*R0*.18}
+    const rr=q.r;bhPos[i*3]=Math.cos(q.a)*rr;bhPos[i*3+1]=q.y*(rr/(R0*3));bhPos[i*3+2]=Math.sin(q.a)*rr;
+    const hh=Math.max(0,Math.min(1,1-(rr/R0-1)/4.4));bhCol[i*3]=1;bhCol[i*3+1]=.35+.6*hh;bhCol[i*3+2]=.1+.7*hh*hh+(hh<.25?.5:0)}
+  bhGeo.attributes.position.needsUpdate=true;bhGeo.attributes.color.needsUpdate=true;bhPts.material.size=.5+.35*ease}
+admReady=true;
 function finish(){
   finished=true;let best=null,isNew=false;
-  try{best=parseFloat(localStorage.getItem(BK));if(!best||t<best){isNew=true;localStorage.setItem(BK,t.toFixed(2));best=t}}catch(e){best=best||t}
+  try{best=parseFloat(localStorage.getItem(BK));if(admUsed){best=best||t}else if(!best||t<best){isNew=true;localStorage.setItem(BK,t.toFixed(2));best=t}}catch(e){best=best||t}
   if(isNew){GH={t:+t.toFixed(2),d:rec.slice()};try{localStorage.setItem('hien-gh-'+BK,JSON.stringify(GH))}catch(e){}}
   const rk=rankOf(t);let nu=false;
   if(!Q.get('seed'))try{const old=rkOf(SI),had=SI+1<STG.length&&unl(SI+1);if(RO[old]===undefined||RO[rk]>RO[old])localStorage.setItem('hien-rk'+SI,rk);nu=SI+1<STG.length&&!had&&unl(SI+1)}catch(e){}
   const gain=Math.round({S:300,A:200,B:120,C:60}[rk]*(Q.get('seed')?.5:1)*(SG.cm||1)*MM);coin+=gain;sv('hien-coin',coin);
   const nx=rk==='C'?['B',RT[2]]:rk==='B'?['A',RT[1]]:rk==='A'?['S',RT[0]]:null,go=SI+1<STG.length&&unl(SI+1);
-  $('main').innerHTML='<div id="lbl">RESULT ／ '+SG.n+'</div><div id="big">'+t.toFixed(2)+'<small> 秒</small></div><div id="rk">RANK '+rk+'</div><p id="lead">自己ベスト '+best.toFixed(2)+' 秒。'+(nx?'RANK '+nx[0]+' まであと '+(t-nx[1]).toFixed(2)+' 秒。':'最高ランク。')+(nu?'<br><b>新ステージ解放：'+STG[SI+1].n+'</b>':'')+'<br>◆ +'+gain+(MS.size?'（モディファイア ×'+MM.toFixed(2)+'）':'')+'（所持 '+coin+'）'+(isNew?'<br>ゴースト更新':'')+'</p><div id="act"><span id="go">もう一度</span><a href="?s='+SI+sq+'">ステージ選択</a>'+(go?'<a href="?s='+(SI+1)+sq+'">次のステージ</a>':'')+'</div>';
+  $('main').innerHTML='<div id="lbl">RESULT ／ '+SG.n+'</div><div id="big">'+t.toFixed(2)+'<small> 秒</small></div><div id="rk">RANK '+rk+'</div><p id="lead">自己ベスト '+best.toFixed(2)+' 秒。'+(nx?'RANK '+nx[0]+' まであと '+(t-nx[1]).toFixed(2)+' 秒。':'最高ランク。')+(nu?'<br><b>新ステージ解放：'+STG[SI+1].n+'</b>':'')+'<br>◆ +'+gain+(MS.size?'（モディファイア ×'+MM.toFixed(2)+'）':'')+'（所持 '+coin+'）'+(isNew?'<br>ゴースト更新':'')+(admUsed?'<br>管理者アビリティ使用：ベストタイム・ゴーストの記録対象外':'')+'</p><div id="act"><span id="go">もう一度</span><a href="?s='+SI+sq+'">ステージ選択</a>'+(go?'<a href="?s='+(SI+1)+sq+'">次のステージ</a>':'')+'</div>';
   ov.style.display='flex';$('pb').style.display='none';document.exitPointerLock&&document.exitPointerLock();
 }
 // ループ
@@ -770,11 +846,11 @@ function loop(now){
   let dt=Math.min((now-last)/1000,.05);last=now;
   const n=Math.ceil(dt/.0167)||1;if(!paused)for(let i=0;i<n;i++)step(dt/n);
   const sp=Math.hypot(P.vx,P.vz);
-  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
+  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
   roll+=((-wallSide*.16)-roll)*Math.min(1,dt*10);
-  eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);C.rotation.set(pitch,yaw,roll);vt=now/1000;updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
+  eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);if(BH){const k=.05+.5*Math.min(1,BH.t/BH.T);C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}C.rotation.set(pitch,yaw,roll);if(!(AA&&AA.fx==='ts'&&abT>0)&&!paused)vt+=dt;bhFx(paused?0:dt);updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
   $('time').textContent=t.toFixed(2);$('spd').innerHTML='<b>'+Math.round(sp*3.6)+'</b><small>km/h</small><i>'+SG.n+' ／ '+E.n+(MS.has('O')?' ／ ワンミス':'')+'</i>';
-  G('abh').textContent=AA?(abT>0?AA.n+' 発動中 '+abT.toFixed(1)+'s':abCD>0?AA.n+' CT '+Math.ceil(abCD)+'s':'[Q] '+AA.n+' 準備完了'):'';G('fx').classList.toggle('on',abT>0);
+  G('abh').textContent=AA?(abT>0?AA.n+' 発動中 '+abT.toFixed(1)+'s':abCD>0?AA.n+' CT '+Math.ceil(abCD)+'s':'[Q] '+AA.n+' 準備完了'+(AA.fx==='bh'?(bhDist()<=90?'　● 射程内':'　○ ゴールまで '+Math.round(bhDist())+'m'):'')):'';G('fx').classList.toggle('on',abT>0);
   G('zn').textContent=znT;updGhost();
   if(BOSS&&BOSS.p){const b=BOSS.p,gp=Math.max(0,(P.x-b.x)*b.dx+(P.z-b.z)*b.dz),dg=gp<22&&started&&!finished,e=G('bss');e.style.display=finished?'none':'block';e.textContent='◀ 巨像　'+Math.round(gp)+' m';e.classList.toggle('dg',dg);G('fx').classList.toggle('dg',dg)}
   pips.forEach((p,i)=>{p.classList.toggle('off',i>=dashes);p.style.background=i<dashes?'#2f46d8':(NIGHT?'#ecebe4':'#151922')});
