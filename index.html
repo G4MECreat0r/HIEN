@@ -168,6 +168,19 @@ body.ts canvas{filter:grayscale(1) contrast(1.25)}body.tsx canvas{filter:invert(
 <div id="rot"><div>端末を横向きにしてください<br>画面の向きのロックも解除してください</div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+// ページを再読み込みせずにステージ／モディファイアを切り替える仕組み
+const __B0=(()=>{const b=document.body.cloneNode(true);b.querySelectorAll('script').forEach(e=>e.remove());return b.innerHTML})(),__C0=document.body.className;
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="?"]');if(a){e.preventDefault();__restart(a.getAttribute('href'))}});
+const __L=[],__ae=EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener=function(t,f,o){__L.push([this,t,f,o]);return __ae.call(this,t,f,o)};
+let __td=null;
+function __restart(search){
+  try{history.replaceState(null,'',search)}catch(e){location.href=search;return}
+  if(__td){__td();__td=null}
+  for(const[t,f,fn,o]of __L){try{t.removeEventListener(f,fn,o)}catch(e){}}__L.length=0;
+  document.body.className=__C0;document.body.innerHTML=__B0;
+  __boot()}
+function __boot(){
 const INK=0x151922,BONE=0xecebe4,BLUE=0x2f46d8,YEL=0xf2c230,SKY=0xd6dfd8;
 const Q=new URLSearchParams(location.search),ST=+Q.get('s')||0;
 if(/^#(open|all)$/.test(location.hash))Q.set('open','1');
@@ -176,7 +189,7 @@ let MSL=[];try{MSL=JSON.parse(localStorage.getItem('hien-mods')||'[]')}catch(e){
 if(Q.get('mods')!==null)MSL=Q.get('mods').split('');
 const MS=new Set(MSL.filter(c=>MDEF.some(m=>m[0]===c))),MOD=k=>MS.has(k);
 const MM=1+MDEF.reduce((a,m)=>a+(MS.has(m[0])?m[3]:0),0),MSIG=[...MS].sort().join(''),NIGHT=MOD('Y');
-let ADMIN=false;try{if(Q.get('admin')==='1')localStorage.setItem('hien-admin','1');if(Q.get('admin')==='0')localStorage.removeItem('hien-admin');ADMIN=localStorage.getItem('hien-admin')==='1'}catch(e){}
+let BWIRE=false,bwLatch=false;let ADMIN=false;try{if(Q.get('admin')==='1')localStorage.setItem('hien-admin','1');if(Q.get('admin')==='0')localStorage.removeItem('hien-admin');ADMIN=localStorage.getItem('hien-admin')==='1';BWIRE=ADMIN&&localStorage.getItem('hien-bwire')==='1'}catch(e){}
 let GON=true;try{GON=localStorage.getItem('hien-ghon')!=='0'}catch(e){}
 if(NIGHT)document.body.classList.add('night');
 const D={tc:0,tw:0,gv:1,va:0,wl:1,ge:4,wm:[8,12],dm:[8,12]};
@@ -190,7 +203,7 @@ const STG=[{n:'塔',dx:7,dl:-2,dh:3.4,g0:4,gs:.38,gm:13.5,ga:9},
 const SG=STG[ST]||STG[0],BK='hien-best'+(ST?ST+'v2':'')+(Q.get('seed')?'-'+Q.get('seed'):'')+(MSIG?'-m'+MSIG:'');
 const RO={C:0,B:1,A:2,S:3},rkOf=i=>{try{return localStorage.getItem('hien-rk'+i)||''}catch(e){return ''}};
 const unl=i=>i===0||!!Q.get('open')||(RO[rkOf(i-1)]||0)>=1;
-if(ST>0&&!unl(ST))location.replace('?s=0');
+if(ST>0&&!unl(ST)){__restart('?s=0');return}
 const SI=STG[ST]?ST:0,sq=(Q.get('seed')?'&seed='+Q.get('seed'):'')+(Q.get('open')?'&open=1':'');
 const DESC=['まっすぐ登る基本の塔','右へうねる広い尾根','急カーブが続くS字','低重力。ワイヤー前提の空','全部の足場が崩れる','足場が全部動く','背後から巨大な壁が迫る。止まれば喰われる'];
 function bestOf(i){try{const v=parseFloat(localStorage.getItem('hien-best'+(i?i+'v2':'')));return v?v.toFixed(2)+' 秒':'--'}catch(e){return '--'}}
@@ -486,14 +499,16 @@ function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)c
 function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
 function useAb(){if(started&&!finished&&AA&&AA.fx==='ts'&&abT>0){abT=0;tsOn(false);return}
   if(!started||finished||!AA||abT>0||abCD>0||BH)return;
-  if(AA.fx==='bh'){if(!startBH())return;admUsed=true;abT=AA.dur;abCD=AA.cd;return}
+  if(AA.fx==='bh'||AA.fx==='bw'){if(!startBH(AA.fx))return;admUsed=true;if(AA.fx==='bh'){abT=AA.dur;abCD=AA.cd}return}
   if(AA.fx==='ts'){admUsed=true;tsOn(true)}
   abT=AA.dur;abCD=AA.cd;recalc();if(!AA.fx)showMsg(AA.n+'！')}
 function renderAb(){
-  G('alist').innerHTML=['p','a'].map(t=>'<div class="lbl2">'+(t==='p'?'PASSIVE　常時発動':'ACTIVE　Qキー／「能力」ボタンで発動')+'</div>'+AB.filter(a=>a.t===t&&(!a.admin||ADMIN)).map(a=>{const o=abOk(a.id),eq=(t==='p'?eqP:eqA)===a.id;
+  G('alist').innerHTML=(ADMIN?'<div class="lbl2">ADMIN　ワイヤー</div><div class="acard star'+(BWIRE?' eq':'')+'" data-id="bw"><b><span style="color:'+RC[4]+'">ADMIN</span> ブラックホールワイヤー</b><small>通常のワイヤー（E／クリック／錨ボタン）が、画面中央の先にブラックホールを開いて自分を引き込むワイヤーに置き換わる。壁でも空中でもOK、制限なし</small><em>'+(BWIRE?'ON（押すとOFF）':'OFF（押すとON）')+'</em></div>':'')+['p','a'].map(t=>'<div class="lbl2">'+(t==='p'?'PASSIVE　常時発動':'ACTIVE　Qキー／「能力」ボタンで発動')+'</div>'+AB.filter(a=>a.t===t&&(!a.admin||ADMIN)).map(a=>{const o=abOk(a.id),eq=(t==='p'?eqP:eqA)===a.id;
     return o?'<div class="acard'+(a.r===3?' star':'')+(eq?' eq':'')+'" data-id="'+a.id+'"><b><span style="color:'+RC[a.r]+'">'+(a.admin?'ADMIN':RN[a.r])+'</span> '+a.n+'</b><small>'+a.d+'</small><em>'+(eq?'装備中（押すと外す）':'装備する')+'</em></div>'
       :'<div class="acard" style="border-style:dashed;border-color:#9aa5a0;color:#9aa5a0;cursor:default">？？？</div>'}).join('')).join('')}
-G('alist').onclick=e=>{const c=e.target.closest('.acard');if(!c||c.dataset.id===undefined)return;const a=AB[+c.dataset.id];
+G('alist').onclick=e=>{const c=e.target.closest('.acard');if(!c||c.dataset.id===undefined)return;
+  if(c.dataset.id==='bw'){BWIRE=!BWIRE;try{localStorage.setItem('hien-bwire',BWIRE?'1':'0')}catch(x){}renderAb();return}
+  const a=AB[+c.dataset.id];
   if(a.t==='p')eqP=eqP===a.id?-1:a.id;else eqA=eqA===a.id?-1:a.id;
   sv('hien-eqp',eqP);sv('hien-eqa',eqA);setEq();renderAb()};
 G('ab2').onclick=()=>{G('ac').style.display='block';G('amsg').textContent='ガチャで入手したアビリティを装備できます。';renderAb()};
@@ -596,7 +611,7 @@ setEq();drawCh();updCoin();
     if(k==='G'){GON=!GON;try{localStorage.setItem('hien-ghon',GON?'1':'0')}catch(x){}draw();return}
     if(MS.has(k))MS.delete(k);else MS.add(k);
     try{localStorage.setItem('hien-mods',JSON.stringify([...MS]))}catch(x){}
-    if(Q.get('mods')!==null){const u=new URL(location.href);u.searchParams.delete('mods');location.href=u.toString()}else location.reload()};
+    {const u=new URL(location.href);u.searchParams.delete('mods');__restart(u.search||'?')}};
   draw()})();
 const killY=-30;
 // 錨ライン
@@ -614,10 +629,10 @@ function respawn(){if(MS.has('O')){reset();hookT=null;dashT=0;fly=0;showMsg('ミ
 reset();
 // 入力
 const ov=$('ov');let paused=false;
-(function(){let n=0,tm=0;G('ttl').addEventListener('click',()=>{n++;clearTimeout(tm);tm=setTimeout(()=>n=0,1500);if(n>=7){n=0;let on=false;try{on=localStorage.getItem('hien-admin')!=='1';on?localStorage.setItem('hien-admin','1'):localStorage.removeItem('hien-admin')}catch(e){}alert(on?'管理者モード ON：アビリティ画面に「ブラックホール」「タイムスキップ」が表示されます':'管理者モード OFF');location.reload()}})})();
+(function(){let n=0,tm=0;G('ttl').addEventListener('click',()=>{n++;clearTimeout(tm);tm=setTimeout(()=>n=0,1500);if(n>=7){n=0;let on=false;try{on=localStorage.getItem('hien-admin')!=='1';on?localStorage.setItem('hien-admin','1'):localStorage.removeItem('hien-admin')}catch(e){}alert(on?'管理者モード ON：アビリティ画面に「ブラックホール」「タイムスキップ」が表示されます':'管理者モード OFF');__restart(location.search||'?')}})})();
 function setPause(v){if(!started||finished||paused===v)return;paused=v;$('ps').style.display=v?'flex':'none';if(v){hookHeld=false;drag=false;for(const k in keys)keys[k]=false;document.exitPointerLock&&document.exitPointerLock()}else if(!isTouch){try{R.domElement.requestPointerLock()}catch(e){}}}
-$('pb').addEventListener('click',()=>setPause(true));$('pr').addEventListener('click',()=>setPause(false));
-$('pt').addEventListener('click',()=>{reset();setPause(false)});$('ph').addEventListener('click',()=>{location.href='?s='+SI+sq});
+$('pb').addEventListener('click',()=>setPause(true));document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&started&&!finished&&!paused&&!BH&&!isTouch)setPause(true)});$('pr').addEventListener('click',()=>setPause(false));
+$('pt').addEventListener('click',()=>{reset();setPause(false)});$('ph').addEventListener('click',()=>{__restart('?s='+SI+sq)});
 function begin(){started=true;ov.style.display='none';$('pb').style.display='flex';
   if(isTouch){try{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d)}catch(e){}
     try{screen.orientation.lock('landscape').catch(()=>{})}catch(e){}return}
@@ -683,7 +698,7 @@ const joy={x:0,y:0};
   btn('bJ',()=>{jbuf=.13});btn('bD',dash);btn('bA',useAb);btn('bH',()=>{hookHeld=true},()=>{hookHeld=false});
 })();
 // 更新
-function rayBox(ox,oy,oz,dx,dy,dz,b){let t0=0,t1=75;
+function rayBox(ox,oy,oz,dx,dy,dz,b,mx=75){let t0=0,t1=mx;
   for(const[o,d,lo,hi]of[[ox,dx,b.x0,b.x1],[oy,dy,b.y0,b.y1],[oz,dz,b.z0,b.z1]]){
     if(Math.abs(d)<1e-6){if(o<lo||o>hi)return null}
     else{let a=(lo-o)/d,c=(hi-o)/d;if(a>c){const k=a;a=c;c=k}t0=Math.max(t0,a);t1=Math.min(t1,c);if(t0>t1)return null}}
@@ -741,7 +756,8 @@ function step(dt){
     if(l>60)continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
   if(tgt&&!hookHeld)tgt.scale.setScalar(1.9);
   $('hint').style.opacity=0;
-  if(hookHeld&&started&&!nwz){
+  if(BWIRE){if(hookHeld){if(!BH&&!bwLatch&&started){bwLatch=true;admUsed=true;startBH('bw')}}else bwLatch=false}
+  if(hookHeld&&started&&!nwz&&!BWIRE){
     if(!hookT){let H=null;
       if(tgt)H=tgt.position.clone();
       else{let bt=75;for(const b of boxes){if(b.st===2)continue;const t2=rayBox(ex,ey,ez,cx,cy,cz,b);if(t2!==null&&t2<bt)bt=t2}if(bt<75)H=new THREE.Vector3(ex+cx*bt,ey+cy*bt,ez+cz*bt)}
@@ -797,16 +813,24 @@ const BN=900,bhPos=new Float32Array(BN*3),bhCol=new Float32Array(BN*3),bhP=[];
 for(let i=0;i<BN;i++)bhP.push({r:1.6+Math.random()*3.2,a:Math.random()*6.283,y:(Math.random()-.5)*.5,sp:.6+Math.random()*.9});
 const bhGeo=new THREE.BufferGeometry();bhGeo.setAttribute('position',new THREE.BufferAttribute(bhPos,3));bhGeo.setAttribute('color',new THREE.BufferAttribute(bhCol,3));
 const bhPts=new THREE.Points(bhGeo,new THREE.PointsMaterial({size:.55,map:glowTex,vertexColors:true,alphaTest:0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,sizeAttenuation:true}));bhPts.frustumCulled=false;bhTilt.add(bhPts);
-let bhK=0,bhShow=false,bhTime=0;
-function startBH(){
-  const ex=goal.x,ey=goal.y+5.5,ez=goal.z,sx=P.x,sy=P.y+.9,sz=P.z,dx=ex-sx,dy=ey-sy,dz=ez-sz,L=Math.hypot(dx,dy,dz)||1;
+let bhK=0,bhShow=false,bhTime=0,bhSc=1;
+const bwN=30,bwPos=new Float32Array(bwN*3),bwGeo=new THREE.BufferGeometry();bwGeo.setAttribute('position',new THREE.BufferAttribute(bwPos,3));
+const bwLine=new THREE.Line(bwGeo,new THREE.LineBasicMaterial({color:0xd2a8ff,transparent:true,opacity:.95,fog:false,blending:THREE.AdditiveBlending,depthTest:false}));bwLine.frustumCulled=false;bwLine.visible=false;bwLine.renderOrder=5;S.add(bwLine);
+function startBH(kind){
+  const sx=P.x,sy=P.y+.9,sz=P.z,wire=kind==='bw';let ex,ey,ez,dir=[0,0,0],sc=1;
+  if(wire){const cpt=Math.cos(pitch),d0=[-Math.sin(yaw)*cpt,Math.sin(pitch),-Math.cos(yaw)*cpt],ox=P.x,oy=P.y+eyeH,oz=P.z;
+    let tm=140;for(const b of boxes){if(b.st===2)continue;const r=rayBox(ox,oy,oz,d0[0],d0[1],d0[2],b,400);if(r!==null&&r<tm)tm=r}
+    const back=Math.min(3,tm*.5);ex=ox+d0[0]*(tm-back);ey=oy+d0[1]*(tm-back);ez=oz+d0[2]*(tm-back);dir=d0;sc=.55}
+  else{ex=goal.x;ey=goal.y+5.5;ez=goal.z}
+  bhSc=sc;
+  const dx=ex-sx,dy=ey-sy,dz=ez-sz,L=Math.hypot(dx,dy,dz)||1;
   let ux=-dz,uz=dx;const ul=Math.hypot(ux,uz)||1;ux/=ul;uz/=ul;const u1=[ux,0,uz];
   const nx=dx/L,ny=dy/L,nz=dz/L,v2=[ny*u1[2]-nz*u1[1],nz*u1[0]-nx*u1[2],nx*u1[1]-ny*u1[0]];
-  BH={t:0,T:Math.min(3.1,.6+L/42),sx,sy,sz,ex,ey,ez,u1,u2:v2,a0:Math.random()*6.283};
-  BHG.position.set(ex,ey,ez);BHG.visible=true;bhShow=true;bhK=0;bhTime=0;G('bhv').classList.add('on');showMsg('ブラックホール');
+  BH={t:0,T:wire?Math.max(.8,Math.min(1.8,.5+L/80)):Math.min(3.1,.6+L/42),sx,sy,sz,ex,ey,ez,u1,u2:v2,a0:Math.random()*6.283,wire,dir};
+  BHG.position.set(ex,ey,ez);BHG.visible=true;bhShow=true;bhK=0;bhTime=0;G('bhv').classList.add('on');showMsg(wire?'ブラックホールワイヤー':'ブラックホール');
   hookT=null;dashT=0;fly=0;hookHeld=false;return true}
 function stepBH(dt){const b=BH;b.t+=dt;
-  const e=Math.max(0,Math.min(1,(b.t-.5)/(b.T-.5))),k=e*e*(1.35-.35*e),o=(1-k)*3.4,a=b.a0+e*15,ca=Math.cos(a)*o,sa=Math.sin(a)*o;
+  const e=Math.max(0,Math.min(1,(b.t-.5)/(b.T-.5))),k=e*e*(1.35-.35*e),o=(1-k)*(b.wire?1.6:3.4)*Math.min(1,e*8),a=b.a0+e*15,ca=Math.cos(a)*o,sa=Math.sin(a)*o;
   P.x=b.sx+(b.ex-b.sx)*k+ca*b.u1[0]+sa*b.u2[0];
   P.y=b.sy-.9+(b.ey-b.sy)*k+ca*b.u1[1]+sa*b.u2[1];
   P.z=b.sz+(b.ez-b.sz)*k+ca*b.u1[2]+sa*b.u2[2];
@@ -814,13 +838,19 @@ function stepBH(dt){const b=BH;b.t+=dt;
   const dx=b.ex-P.x,dy=b.ey-(P.y+eyeH),dz=b.ez-P.z,h=Math.hypot(dx,dz)||1;
   const ty=Math.atan2(-dx,-dz),dY=Math.atan2(Math.sin(ty-yaw),Math.cos(ty-yaw));yaw+=dY*Math.min(1,dt*7);
   pitch+=(Math.max(-1.3,Math.min(1.3,Math.atan2(dy,h)))-pitch)*Math.min(1,dt*7);
+  if(b.t>=b.T&&b.wire){const sp=18;P.x=b.ex;P.y=b.ey-.6;P.z=b.ez;P.vx=b.dir[0]*sp;P.vy=b.dir[1]*sp+9;P.vz=b.dir[2]*sp;airJump=E.aj;dashes=2;BH=null;G('bhv').classList.remove('on');return}
   if(b.t>=b.T){P.x=b.ex;P.y=b.ey-eyeH;P.z=b.ez;const f=G('bhf');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');BH=null;G('bhv').classList.remove('on');if(!finished)finish()}}
-function bhFxOff(){bhShow=false;BHG.visible=false;G('bhv').classList.remove('on')}
+function bhFxOff(){bhShow=false;BHG.visible=false;bwLine.visible=false;G('bhv').classList.remove('on')}
 function bhFx(dt){
   if(!bhShow)return;bhTime+=dt;
+  bwLine.visible=!!(BH&&BH.wire);
+  if(bwLine.visible){const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw),x0=P.x+rx*.45+fx*.4,y0=P.y+1.15,z0=P.z+rz*.45+fz*.4,w=.4*(1-Math.min(1,BH.t/BH.T));
+    for(let i=0;i<bwN;i++){const u=i/(bwN-1),ph=u*18-bhTime*28,sn=Math.sin(ph)*w*Math.sin(u*Math.PI),cs=Math.cos(ph)*w*Math.sin(u*Math.PI);
+      bwPos[i*3]=x0+(BH.ex-x0)*u+rx*sn;bwPos[i*3+1]=y0+(BH.ey-y0)*u+cs;bwPos[i*3+2]=z0+(BH.ez-z0)*u+rz*sn}
+    bwGeo.attributes.position.needsUpdate=true}
   if(BH)bhK=Math.min(1,BH.t/.55);else{bhK=Math.max(0,bhK-dt*2.2);if(bhK<=0){bhFxOff();return}}
   const collapse=BH?1-Math.max(0,(BH.t-(BH.T-.3))/.3)*.7:1,sc=bhK*collapse,ease=1-Math.pow(1-Math.min(1,sc),3);
-  const R0=3.2*ease;bhCore.scale.setScalar(Math.max(.001,R0));bhHalo.scale.setScalar(Math.max(.001,R0*1.32));bhHalo.lookAt(C.position);
+  const R0=3.2*ease*bhSc;bhCore.scale.setScalar(Math.max(.001,R0));bhHalo.scale.setScalar(Math.max(.001,R0*1.32));bhHalo.lookAt(C.position);
   bhDisk.scale.setScalar(Math.max(.001,R0*5.2));BHT.value=bhTime;BHA.value=Math.min(1,ease*1.4);
   bhGlow.scale.setScalar(Math.max(.001,R0*(15+3*Math.sin(bhTime*5))));bhGlow.material.opacity=.85*ease;
   bhTilt.rotation.z=.25+Math.sin(bhTime*.8)*.08;
@@ -828,7 +858,7 @@ function bhFx(dt){
     if(q.r<R0*1.05||q.r>R0*5.4){q.r=R0*(2.6+Math.random()*2.8);q.y=(Math.random()-.5)*R0*.18}
     const rr=q.r;bhPos[i*3]=Math.cos(q.a)*rr;bhPos[i*3+1]=q.y*(rr/(R0*3));bhPos[i*3+2]=Math.sin(q.a)*rr;
     const hh=Math.max(0,Math.min(1,1-(rr/R0-1)/4.4));bhCol[i*3]=1;bhCol[i*3+1]=.35+.6*hh;bhCol[i*3+2]=.1+.7*hh*hh+(hh<.25?.5:0)}
-  bhGeo.attributes.position.needsUpdate=true;bhGeo.attributes.color.needsUpdate=true;bhPts.material.size=.5+.35*ease}
+  bhGeo.attributes.position.needsUpdate=true;bhGeo.attributes.color.needsUpdate=true;bhPts.material.size=(.5+.35*ease)*Math.max(.5,bhSc)}
 admReady=true;
 function finish(){
   finished=true;let best=null,isNew=false;
@@ -842,8 +872,10 @@ function finish(){
   ov.style.display='flex';$('pb').style.display='none';document.exitPointerLock&&document.exitPointerLock();
 }
 // ループ
+let dead=false;__td=()=>{dead=true;try{R.dispose();const gl=R.getContext(),x=gl&&gl.getExtension('WEBGL_lose_context');x&&x.loseContext()}catch(e){}try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}};
 let last=performance.now();
 function loop(now){
+  if(dead)return;
   let dt=Math.min((now-last)/1000,.05);last=now;
   const n=Math.ceil(dt/.0167)||1;if(!paused)for(let i=0;i<n;i++)step(dt/n);
   const sp=Math.hypot(P.vx,P.vz);
@@ -858,4 +890,6 @@ function loop(now){
   R.render(S,C);requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+}
+__boot();
 </script></body></html>
