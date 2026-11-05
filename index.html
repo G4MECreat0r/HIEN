@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>飛燕 HIEN</title>
@@ -153,9 +153,12 @@ body.night #hud{color:#ecebe4}body.night #dot{background:#ecebe4}body.night .pip
 #tsr.go{animation:tsring .9s ease-out}
 @keyframes tsring{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(28)}}
 body.ts canvas{filter:grayscale(1) contrast(1.25)}body.tsx canvas{filter:invert(1) contrast(1.2)}
+#hdv{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at 50% 50%,rgba(0,0,0,0) 42%,rgba(40,200,255,.2) 78%,rgba(255,60,200,.4) 100%);mix-blend-mode:screen}
+#hdv.on{opacity:1;animation:hdp 1.4s ease-in-out infinite alternate}
+@keyframes hdp{to{filter:hue-rotate(60deg) brightness(1.3)}}
 </style></head><body>
 <div id="hud"><div id="time">0.00</div><div id="spd"></div><div id="dot"></div><div id="msg"></div><div id="hint">錨をロック中：長押しで引き寄せ（クリック / E / 錨ボタン）</div><div id="zn"></div><div id="bss"></div><div id="abh"></div><div id="fx"></div><div id="pips"><div class="pip"></div><div class="pip"></div></div></div>
-<div id="bhv"></div><div id="tsv"></div><div id="tsr"></div><div id="bhf"></div><div id="pb">Ⅱ</div><div id="ps"><h2>PAUSE</h2><div class="pbt y" id="pr">再開</div><div class="pbt" id="pt">やり直し</div><div class="pbt d" id="ph">ホームへ戻る</div></div>
+<div id="hdv"></div><div id="bhv"></div><div id="tsv"></div><div id="tsr"></div><div id="bhf"></div><div id="pb">Ⅱ</div><div id="ps"><h2>PAUSE</h2><div class="pbt y" id="pr">再開</div><div class="pbt" id="pt">やり直し</div><div class="pbt d" id="ph">ホームへ戻る</div></div>
 <div id="ov"><div id="side"><div id="ttl">飛燕</div><div id="sub">HIEN</div></div>
 <div id="main"><div id="top"><div id="tabs"><span class="tab on" data-p="p1">ステージ</span><span class="tab" data-p="p2">キャラ</span><span class="tab" data-p="p3">アビリティ</span><span class="tab" data-p="p4">操作</span></div><span id="gb">ガチャ ◆<span id="coin">0</span></span></div><div id="body"><div id="p1" class="pane"><p id="lead">止まったら落ちる。壁を蹴り、空を引き寄せ、最速で駆け抜けろ。RANK B以上で次のステージが開く。</p><div id="stages"></div><div id="tgt"></div><div class="lbl2">MODIFIER　付けるほどコイン倍率UP</div><div id="mods"></div><div id="mtot"></div></div><div id="p2" class="pane"><div id="chars"></div><div id="cd"></div><div id="cs"></div></div><div id="p3" class="pane"><div id="abs"></div><span id="ab2">アビリティ編成</span><p class="note">アビリティはガチャで入手します。</p></div><div id="p4" class="pane"><p>壁でも足場でも、狙った場所にワイヤーを撃てる。黄色い結晶は吸着ポイント。ワイヤーは巻き取りながら振り子のように振れ、離した瞬間に勢いのまま飛び出す。</p><p>青いパッドは加速、黄色いパッドはジャンプ台。橙の足場は乗ると崩れ、黒い足場は動く。コースのどこかに、隠された大ジャンプの道がある。見つければ一気に進める。</p><p>モディファイア：ステージ画面で、風・ワイヤー禁止・回転壁・夜・レーザー／落石・ワンミス即やり直しを好きに足せる。付けた分だけクリア時のコインが増える。ボスステージ「追跡」は、背後から迫る巨大な壁から逃げ切れ。ベスト更新時の走りはゴーストとして次回に再生される。</p><p class="tp">ダッシュ直後に「跳ぶ」で加速ジャンプ。左で移動、右スワイプで視点。「ワイヤー」を押し続けると、狙った壁や足場に刺さって巻き取り・スイングできる。着地の瞬間に「跳ぶ」で連続ホップ。走り続けるほど速くなる。ワイヤー中に「ダッシュ」でワイヤーダッシュ。</p><dl><dt>WASD</dt><dd>移動</dd><dt>Space</dt><dd>ジャンプ（空中でもう一回／壁で蹴り上がり）</dd><dt>Shift</dt><dd>エアダッシュ（視線方向・2回、着地で回復）。ダッシュ中か直後に Space で加速ジャンプ</dd><dt>左クリック / E</dt><dd>立体機動：狙った壁・足場にワイヤー射出。押し続けて巻き取り・スイング、離して射出</dd><dt>加速</dt><dd>走り続けるほど最高速が伸びる／着地の瞬間にSpaceで連続ホップ／ワイヤー中にShiftでワイヤーダッシュ、進行方向キーで振り子を加速、0.25秒以上掴んで離すと勢いが乗る／壁蹴りは速度を保つ</dd><dt>R</dt><dd>最初から</dd></dl></div></div><div id="act"><span id="go">START</span><a id="rnd" href="#">ランダムコース</a></div></div></div>
 <div id="tc"><div id="sz"></div><div id="lz"></div><div id="base"><div id="knob"></div></div><div class="tb" id="bJ">跳ぶ</div><div class="tb" id="bD">ダッシュ</div><div class="tb" id="bA">能力</div><div class="tb" id="bH" style="font-size:12px">ワイヤー</div></div>
@@ -493,14 +496,18 @@ const AB=[
 {id:9,t:'a',r:2,n:'疾空連舞',d:'6秒間 ダッシュ無制限＆距離 +15％（CT 26秒）',dur:6,cd:26,m:{dd:1.15,dv:1.08},inf:1},
 {id:10,t:'a',r:3,n:'神速',d:'【最強】6秒間 全能力 +25％前後。ダッシュ無制限（CT 30秒）',dur:6,cd:30,m:{spd:1.25,run:1.25,dv:1.25,dd:1.2,air:1.25,hk:1.25,hcap:1.12,g:.88,ha:1.25,wk:1.12},inf:1},
 {id:11,t:'a',r:4,admin:1,fx:'bh',n:'ブラックホール',d:'【管理者】どこからでも発動：ゴール上空に漆黒の渦が開き、あなたを一気にゴールまで吸い込む（制限なし）',dur:2.6,cd:0,m:{}},
-{id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】時を止める。足場・レーザー・落石・風・ボスが静止し、タイマーも止まる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{}}];
+{id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】時を止める。足場・レーザー・落石・風・ボスが静止し、タイマーも止まる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{}},
+{id:13,t:'a',r:4,admin:1,fx:'hd',n:'ハイパードライブ',d:'【管理者】超高速のワープ状態に突入。光の筋が流れるトンネルが視界を包み、速度が約2倍になる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{spd:2,run:1.4,air:1.6,dv:1.3,hc:1.6}},
+{id:14,t:'a',r:4,admin:1,fx:'sn',n:'超新星',d:'【管理者】自分を中心に星が爆発する。光の殻・衝撃波・光の柱が広がり、爆風で空高く打ち上げられる（制限なし）',dur:0,cd:0,m:{}}];
 const abOk=i=>!!AB[i]&&(abOwn.has(i)||(ADMIN&&!!AB[i].admin));
 let apity=ld('hien-apity',0),abOwn=new Set(ld('hien-abown',[])),eqP=ld('hien-eqp',-1),eqA=ld('hien-eqa',-1),PA=null,AA=null,abT=0,abCD=0;
 function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}if(ADMIN){E.spd*=ADM.spd;E.g*=ADM.g;if(ADM.aj)E.aj=99;if(ADM.inf)E.inf=1}}
 function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
-function useAb(){if(started&&!finished&&AA&&AA.fx==='ts'&&abT>0){abT=0;tsOn(false);return}
-  if(!started||finished||!AA||abT>0||abCD>0||BH)return;
+function useAb(){if(started&&!finished&&AA&&(AA.fx==='ts'||AA.fx==='hd')&&abT>0){abT=0;if(AA.fx==='ts')tsOn(false);else hdOn(false);return}
+  if(!started||finished||!AA||abT>0||abCD>0||BH||SN)return;
   if(AA.fx==='bh'||AA.fx==='bw'){if(!startBH(AA.fx))return;admUsed=true;if(AA.fx==='bh'){abT=AA.dur;abCD=AA.cd}return}
+  if(AA.fx==='sn'){if(startSN())admUsed=true;return}
+  if(AA.fx==='hd'){admUsed=true;hdOn(true)}
   if(AA.fx==='ts'){admUsed=true;tsOn(true)}
   abT=AA.dur;abCD=AA.cd;recalc();if(!AA.fx)showMsg(AA.n+'！')}
 function renderAb(){
@@ -621,10 +628,10 @@ hookLine.frustumCulled=false;hookLine.visible=false;S.add(hookLine);
 // 状態
 const P={x:0,y:0,z:0,vx:0,vy:0,vz:0,ride:null},HW=.35;let HH=1.8;
 let eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
-let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='',admUsed=false,BH=null,admReady=false;
+let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='',admUsed=false,BH=null,SN=null,admReady=false;
 const keys={};
 const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
-function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;P.ride=null;cp=0;t=0;running=false;finished=false;yaw=SG.yaw0||0;pitch=0;dashes=2;airJump=E.aj;boostT=0;runT=0;hop=0;abT=0;abCD=0;rec=[];admUsed=false;BH=null;if(admReady){tsOn(false);bhFxOff()}if(BOSS){BOSS.s=-34;updBoss(1)}for(const R of rocks){R.st=0;R.tm=1.2+Math.random()*2;R.g.visible=false;R.mk.visible=false}
+function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;P.ride=null;cp=0;t=0;running=false;finished=false;yaw=SG.yaw0||0;pitch=0;dashes=2;airJump=E.aj;boostT=0;runT=0;hop=0;abT=0;abCD=0;rec=[];admUsed=false;BH=null;if(admReady){tsOn(false);bhFxOff();hdOn(false);snOff();SN=null}if(BOSS){BOSS.s=-34;updBoss(1)}for(const R of rocks){R.st=0;R.tm=1.2+Math.random()*2;R.g.visible=false;R.mk.visible=false}
   for(const b of vns){b.st=0;b.tm=0;vis(b,true);b.me.material.opacity=1}}
 function respawn(){if(MS.has('O')&&!(ADMIN&&ADM.god)){reset();hookT=null;dashT=0;fly=0;showMsg('ミス！最初から');return}const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;if(c.b){P.x=(c.b.x0+c.b.x1)/2;P.z=(c.b.z0+c.b.z1)/2}for(const b of vns){b.st=0;vis(b,true);b.me.material.opacity=1}if(BOSS){BOSS.s=Math.min(BOSS.s,c.s-32);updBoss(1)}P.vx=P.vy=P.vz=0;P.ride=null;dashT=0;boostT=0;runT=0;hop=0;fly=0;hookT=null}
 reset();
@@ -719,7 +726,8 @@ function step(dt){
   if(ADMIN&&(ADM.god||ADM.aj||ADM.inf||ADM.spd!==1||ADM.g!==1||ADM.slow!==1))admUsed=true;
   jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;boostT-=dt;padCD-=dt;fly-=dt;gt+=wdt;abT-=dt;abCD-=dt;recalc();
   if(tfz){if(abT<=0)tsOn(false);}
-  if(BH){stepBH(dt);return}landT=grounded?landT+dt:0;
+  if(BH){stepBH(dt);return}
+  if(SN){stepSN(dt);return}landT=grounded?landT+dt:0;
   // 動く足場・崩れる足場
   const ride=P.ride;P.ride=null;
   for(const b of mvs){const dx=mvBox(b,b.mv.c+Math.sin(gt*b.mv.s+b.mv.p)*b.mv.a,b.mv.ax);if(ride===b)P[b.mv.ax]+=dx}
@@ -889,6 +897,64 @@ if(ADMIN){
     else if(b==='rst'){Object.assign(ADM,{god:0,aj:0,inf:0,spd:1,g:1,slow:1});svA();draw()}});
   pa.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;ADM[k]=+e.target.value;G('av-'+k).textContent='×'+ADM[k].toFixed(2);svA()});
   draw()}
+// ===== ハイパードライブ（ワープトンネル） =====
+const HD={on:false,a:0,t:0};if(!C.parent)S.add(C);
+const HDV='varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
+const HDF='varying vec2 vUv;uniform float uT;uniform float uA;float hs(float n){return fract(sin(n*12.9898)*43758.5453);}void main(){float id=floor(vUv.x*110.);float h=hs(id);float h2=hs(id+7.3);float y=fract(vUv.y*(1.5+h*3.5)-uT*(2.2+h*5.)+h2*9.);float st=smoothstep(0.,.03,y)*(1.-smoothstep(.03,.55,y));float w=.55+.45*sin(uT*3.+id);vec3 c=mix(vec3(.15,.85,1.),vec3(1.,.25,.85),h2);c=mix(c,vec3(1.),pow(st,3.)*.6);float edge=.25+.75*vUv.y;gl_FragColor=vec4(c*st*(1.4+w),st*edge*uA*.95);}';
+const hdTun=new THREE.Mesh(new THREE.CylinderGeometry(5.5,5.5,70,64,1,true),new THREE.ShaderMaterial({uniforms:{uT:{value:0},uA:{value:0}},vertexShader:HDV,fragmentShader:HDF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false,side:THREE.BackSide}));
+hdTun.rotation.x=Math.PI/2;hdTun.position.z=-30;hdTun.renderOrder=9;hdTun.frustumCulled=false;hdTun.visible=false;C.add(hdTun);
+const HN=260,hdPos=new Float32Array(HN*6),hdCol=new Float32Array(HN*6),hdL=[];
+for(let i=0;i<HN;i++){const a=Math.random()*6.283,r=1.8+Math.random()*5,c=Math.random()<.5?[.2,.9,1]:Math.random()<.5?[1,.3,.9]:[1,1,1];hdL.push({x:Math.cos(a)*r,y:Math.sin(a)*r,z:-2-Math.random()*40,l:2+Math.random()*5,sp:.7+Math.random()*.6});
+  for(let k=0;k<2;k++){const f=k?0:1;hdCol[i*6+k*3]=c[0]*f;hdCol[i*6+k*3+1]=c[1]*f;hdCol[i*6+k*3+2]=c[2]*f}}
+const hdGeo=new THREE.BufferGeometry();hdGeo.setAttribute('position',new THREE.BufferAttribute(hdPos,3));hdGeo.setAttribute('color',new THREE.BufferAttribute(hdCol,3));
+const hdLines=new THREE.LineSegments(hdGeo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false,fog:false}));hdLines.frustumCulled=false;hdLines.renderOrder=9;hdLines.visible=false;C.add(hdLines);
+function hdOn(on){HD.on=on;G('hdv').classList.toggle('on',on)}
+function hdFx(dt){
+  HD.a+=((HD.on?1:0)-HD.a)*Math.min(1,dt*5);if(!HD.on&&HD.a<.01)HD.a=0;
+  const vis=HD.a>0;hdTun.visible=hdLines.visible=vis;if(!vis)return;
+  HD.t+=dt;hdTun.material.uniforms.uT.value=HD.t;hdTun.material.uniforms.uA.value=HD.a;hdLines.material.opacity=HD.a;
+  const sp=Math.hypot(P.vx,P.vz),v=(70+Math.min(60,sp*2.4))*(.6+.4*HD.a);
+  for(let i=0;i<HN;i++){const q=hdL[i];q.z+=v*q.sp*dt;if(q.z>-1){q.z=-42-Math.random()*8;const a=Math.random()*6.283,r=1.8+Math.random()*5;q.x=Math.cos(a)*r;q.y=Math.sin(a)*r}
+    hdPos[i*6]=q.x;hdPos[i*6+1]=q.y;hdPos[i*6+2]=q.z;hdPos[i*6+3]=q.x;hdPos[i*6+4]=q.y;hdPos[i*6+5]=q.z-q.l*(.5+HD.a)}
+  hdGeo.attributes.position.needsUpdate=true}
+// ===== 超新星 =====
+const SNV={on:false,t:0,x:0,y:0,z:0,sh:0,fv:0,flash:false};
+const snGrp=new THREE.Group();snGrp.visible=false;S.add(snGrp);
+const SHV='varying vec3 vN;varying vec3 vV;varying vec3 vP;void main(){vP=position;vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}';
+const SHF='varying vec3 vN;varying vec3 vV;varying vec3 vP;uniform float uT;uniform float uA;void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);float n=sin(vP.x*9.+uT*10.)*sin(vP.y*9.-uT*8.)*sin(vP.z*9.+uT*6.);vec3 c=mix(vec3(1.,.42,.08),vec3(1.,.97,.85),clamp(f*.8+n*.35,0.,1.));gl_FragColor=vec4(c*(1.+f),clamp(f*.9+.18+n*.12,0.,1.)*uA);}';
+const snShellM=new THREE.ShaderMaterial({uniforms:{uT:{value:0},uA:{value:0}},vertexShader:SHV,fragmentShader:SHF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+const snShell=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),snShellM);snGrp.add(snShell);
+const snCoreM=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false});
+const snCore=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),snCoreM);snGrp.add(snCore);
+const snRings=[0xffd27a,0x7ad8ff,0xff7ad0].map((c,i)=>{const m=new THREE.Mesh(new THREE.RingGeometry(.9,1,96),new THREE.MeshBasicMaterial({color:c,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+  m.rotation.x=-Math.PI/2+(i?(i===1?.5:-.5):0);m.rotation.z=i*.6;snGrp.add(m);return m});
+const snBeamM=new THREE.MeshBasicMaterial({color:0xfff0c0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false});
+const snBeam=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,28,1,true),snBeamM);snGrp.add(snBeam);
+const SPN=900,snPos=new Float32Array(SPN*3),snCol=new Float32Array(SPN*3),snP=[];
+for(let i=0;i<SPN;i++){const a=Math.random()*6.283,b=Math.acos(2*Math.random()-1);snP.push({d:[Math.sin(b)*Math.cos(a),Math.cos(b),Math.sin(b)*Math.sin(a)],r:5+Math.random()*12,v:12+Math.random()*34,k:Math.random()})}
+const snGeo=new THREE.BufferGeometry();snGeo.setAttribute('position',new THREE.BufferAttribute(snPos,3));snGeo.setAttribute('color',new THREE.BufferAttribute(snCol,3));
+const snPts=new THREE.Points(snGeo,new THREE.PointsMaterial({size:.7,map:glowTex,vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));snPts.frustumCulled=false;snGrp.add(snPts);
+function startSN(){if(BH||SN)return false;SN={t:0};SNV.on=true;SNV.t=0;SNV.x=P.x;SNV.y=P.y+.9;SNV.z=P.z;SNV.flash=false;snGrp.position.set(SNV.x,SNV.y,SNV.z);snGrp.visible=true;hookT=null;dashT=0;fly=0;hookHeld=false;return true}
+function stepSN(dt){SN.t+=dt;P.vx=P.vy=P.vz=0;P.ride=null;running=true;hookT=null;
+  if(SN.t>=.9){const f=fwd();P.vy=36;P.vx=f[0]*16;P.vz=f[1]*16;grounded=false;airJump=E.aj;dashes=2;SN=null}}
+function snOff(){SNV.on=false;SNV.sh=0;SNV.fv=0;snGrp.visible=false}
+function snFx(dt){
+  if(!SNV.on)return;SNV.t+=dt;const t=SNV.t,B=.9,c=Math.min(1,t/B),u=Math.max(0,t-B);
+  if(t>3.4){snOff();return}
+  if(t>=B&&!SNV.flash){SNV.flash=true;const f=G('bhf');f.classList.remove('go');void f.offsetWidth;f.classList.add('go')}
+  snShellM.uniforms.uT.value=t;
+  let sr,sa,cr,ca;
+  if(t<B){sr=.4+3.2*c*c;sa=.35+.4*c;cr=.2+.8*c*c;ca=.18+.25*c;SNV.sh=.03+.35*c*c;SNV.fv=-6*c}
+  else{sr=3.6+u*34;sa=Math.max(0,.55-u/2.2);cr=1+u*4;ca=Math.max(0,.3-u/1.2);SNV.sh=.9*Math.exp(-u*3);SNV.fv=Math.max(0,22*Math.exp(-u*2.2)-6*(1-Math.min(1,u*4)))}
+  snShell.scale.setScalar(sr);snShellM.uniforms.uA.value=sa;snCore.scale.setScalar(cr);snCoreM.opacity=ca;
+  snRings.forEach((m,i)=>{const w=Math.max(0,u-i*.12);m.visible=u>0;m.scale.setScalar(1+w*(48+i*10));m.material.opacity=Math.max(0,1-w/1.5)*.9});
+  const bh=u>0?Math.max(0,1-u/1.3):0;snBeam.visible=bh>0;snBeam.scale.set(.6+2.6*bh,160,.6+2.6*bh);snBeam.position.y=78;snBeamM.opacity=bh*.9;
+  for(let i=0;i<SPN;i++){const q=snP[i];let r,hh;
+    if(t<B){r=q.r*(1-c*c)+.8;hh=.3+.5*c}else{r=3.4+q.v*u;hh=Math.max(0,1-u/1.6)*(.5+.5*q.k)}
+    const g=t<B?0:-5.5*u*u*q.k;
+    snPos[i*3]=q.d[0]*r;snPos[i*3+1]=q.d[1]*r+g;snPos[i*3+2]=q.d[2]*r;
+    snCol[i*3]=hh;snCol[i*3+1]=hh*(.45+.5*q.k);snCol[i*3+2]=hh*(.12+.6*(1-q.k)*(t<B?1:Math.max(0,1-u)))}
+  snGeo.attributes.position.needsUpdate=true;snGeo.attributes.color.needsUpdate=true;snPts.material.size=.55+.5*c}
 admReady=true;
 function finish(){
   finished=true;let best=null,isNew=false;
@@ -909,9 +975,10 @@ function loop(now){
   let dt=Math.min((now-last)/1000,.05);last=now;if(ADMIN)dt*=ADM.slow;
   const n=Math.ceil(dt/.0167)||1;if(!paused)for(let i=0;i<n;i++)step(dt/n);
   const sp=Math.hypot(P.vx,P.vz);
-  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
+  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0)+HD.a*40+(SNV.on?SNV.fv:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
   roll+=((-wallSide*.16)-roll)*Math.min(1,dt*10);
-  eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);if(BH){const k=.05+.5*Math.min(1,BH.t/BH.T);C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}C.rotation.set(pitch,yaw,roll);if(!(AA&&AA.fx==='ts'&&abT>0)&&!paused)vt+=dt;bhFx(paused?0:dt);updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
+  eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);if(BH){const k=.05+.5*Math.min(1,BH.t/BH.T);C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}
+  if(SNV.on&&SNV.sh>0){const k=SNV.sh;C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}C.rotation.set(pitch,yaw,roll);if(!(AA&&AA.fx==='ts'&&abT>0)&&!paused)vt+=dt;bhFx(paused?0:dt);hdFx(paused?0:dt);snFx(paused?0:dt);updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
   $('time').textContent=t.toFixed(2);$('spd').innerHTML='<b>'+Math.round(sp*3.6)+'</b><small>km/h</small><i>'+SG.n+' ／ '+E.n+(MS.has('O')?' ／ ワンミス':'')+'</i>';
   G('abh').textContent=AA?(abT>1e8?AA.n+' 発動中（Qで解除）':abT>0?AA.n+' 発動中 '+abT.toFixed(1)+'s':abCD>0?AA.n+' CT '+Math.ceil(abCD)+'s':'[Q] '+AA.n+' 準備完了'+(AA.fx==='bh'?'　ゴールまで '+Math.round(bhDist())+'m':'')):'';G('fx').classList.toggle('on',abT>0);
   G('zn').textContent=znT;updGhost();
