@@ -497,8 +497,8 @@ const AB=[
 {id:10,t:'a',r:3,n:'神速',d:'【最強】6秒間 全能力 +25％前後。ダッシュ無制限（CT 30秒）',dur:6,cd:30,m:{spd:1.25,run:1.25,dv:1.25,dd:1.2,air:1.25,hk:1.25,hcap:1.12,g:.88,ha:1.25,wk:1.12},inf:1},
 {id:11,t:'a',r:4,admin:1,fx:'bh',n:'ブラックホール',d:'【管理者】どこからでも発動：ゴール上空に漆黒の渦が開き、あなたを一気にゴールまで吸い込む（制限なし）',dur:2.6,cd:0,m:{}},
 {id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】時を止める。足場・レーザー・落石・風・ボスが静止し、タイマーも止まる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{}},
-{id:13,t:'a',r:4,admin:1,fx:'hd',n:'ハイパードライブ',d:'【管理者】超高速のワープ状態に突入。光の筋が流れるトンネルが視界を包み、速度が約2倍になる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{spd:2,run:1.4,air:1.6,dv:1.3,hc:1.6}},
-{id:14,t:'a',r:4,admin:1,fx:'sn',n:'超新星',d:'【管理者】自分を中心に星が爆発する。光の殻・衝撃波・光の柱が広がり、爆風で空高く打ち上げられる（制限なし）',dur:0,cd:0,m:{}}];
+{id:13,t:'a',r:3,fx:'hd',n:'ハイパードライブ',d:'【SSR】8秒間 超高速のワープ状態。光の筋のトンネルに包まれ、移動速度が約2倍（CT 28秒）',dur:8,cd:28,m:{spd:2,run:1.4,air:1.6,dv:1.3,hc:1.6}},
+{id:14,t:'a',r:3,fx:'sn',n:'超新星',d:'【SSR】自分を中心に星が爆発。衝撃波と光の柱が広がり、爆風で空高く打ち上げられる（CT 30秒）',dur:0,cd:30,m:{}}];
 const abOk=i=>!!AB[i]&&(abOwn.has(i)||(ADMIN&&!!AB[i].admin));
 let apity=ld('hien-apity',0),abOwn=new Set(ld('hien-abown',[])),eqP=ld('hien-eqp',-1),eqA=ld('hien-eqa',-1),PA=null,AA=null,abT=0,abCD=0;
 function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}if(ADMIN){E.spd*=ADM.spd;E.g*=ADM.g;if(ADM.aj)E.aj=99;if(ADM.inf)E.inf=1}}
@@ -506,8 +506,8 @@ function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G(
 function useAb(){if(started&&!finished&&AA&&(AA.fx==='ts'||AA.fx==='hd')&&abT>0){abT=0;if(AA.fx==='ts')tsOn(false);else hdOn(false);return}
   if(!started||finished||!AA||abT>0||abCD>0||BH||SN)return;
   if(AA.fx==='bh'||AA.fx==='bw'){if(!startBH(AA.fx))return;admUsed=true;if(AA.fx==='bh'){abT=AA.dur;abCD=AA.cd}return}
-  if(AA.fx==='sn'){if(startSN())admUsed=true;return}
-  if(AA.fx==='hd'){admUsed=true;hdOn(true)}
+  if(AA.fx==='sn'){if(startSN())abCD=AA.cd;return}
+  if(AA.fx==='hd')hdOn(true)
   if(AA.fx==='ts'){admUsed=true;tsOn(true)}
   abT=AA.dur;abCD=AA.cd;recalc();if(!AA.fx)showMsg(AA.n+'！')}
 function renderAb(){
@@ -910,6 +910,7 @@ const hdGeo=new THREE.BufferGeometry();hdGeo.setAttribute('position',new THREE.B
 const hdLines=new THREE.LineSegments(hdGeo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false,fog:false}));hdLines.frustumCulled=false;hdLines.renderOrder=9;hdLines.visible=false;C.add(hdLines);
 function hdOn(on){HD.on=on;G('hdv').classList.toggle('on',on)}
 function hdFx(dt){
+  if(HD.on&&!(AA&&AA.fx==='hd'&&abT>0))hdOn(false);
   HD.a+=((HD.on?1:0)-HD.a)*Math.min(1,dt*5);if(!HD.on&&HD.a<.01)HD.a=0;
   const vis=HD.a>0;hdTun.visible=hdLines.visible=vis;if(!vis)return;
   HD.t+=dt;hdTun.material.uniforms.uT.value=HD.t;hdTun.material.uniforms.uA.value=HD.a;hdLines.material.opacity=HD.a;
