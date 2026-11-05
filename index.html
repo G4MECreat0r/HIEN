@@ -189,7 +189,8 @@ let MSL=[];try{MSL=JSON.parse(localStorage.getItem('hien-mods')||'[]')}catch(e){
 if(Q.get('mods')!==null)MSL=Q.get('mods').split('');
 const MS=new Set(MSL.filter(c=>MDEF.some(m=>m[0]===c))),MOD=k=>MS.has(k);
 const MM=1+MDEF.reduce((a,m)=>a+(MS.has(m[0])?m[3]:0),0),MSIG=[...MS].sort().join(''),NIGHT=MOD('Y');
-let BWIRE=false,bwLatch=false;let ADMIN=false;try{if(Q.get('admin')==='1')localStorage.setItem('hien-admin','1');if(Q.get('admin')==='0')localStorage.removeItem('hien-admin');ADMIN=localStorage.getItem('hien-admin')==='1';BWIRE=ADMIN&&localStorage.getItem('hien-bwire')==='1'}catch(e){}
+let BWIRE=false,bwLatch=false;const ADM={god:0,aj:0,inf:0,spd:1,g:1,slow:1};try{Object.assign(ADM,JSON.parse(localStorage.getItem('hien-adm')||'{}'))}catch(e){}
+let ADMIN=false;try{ADMIN=localStorage.getItem('hien-admin')==='1';BWIRE=ADMIN&&localStorage.getItem('hien-bwire')==='1'}catch(e){}
 let GON=true;try{GON=localStorage.getItem('hien-ghon')!=='0'}catch(e){}
 if(NIGHT)document.body.classList.add('night');
 const D={tc:0,tw:0,gv:1,va:0,wl:1,ge:4,wm:[8,12],dm:[8,12]};
@@ -400,7 +401,7 @@ function mkRock(p,k){const g=new THREE.Group(),m=new THREE.Mesh(new THREE.BoxGeo
   mk.add(new THREE.Mesh(new THREE.RingGeometry(1.3,1.6,24),new THREE.MeshBasicMaterial({color:REDC,fog:false})));mk.rotation.x=-Math.PI/2;mk.visible=false;S.add(mk);
   rocks.push({p,g,mk,st:0,tm:1.2+mh(k)*2.5,x:p.x,z:p.z,y:0,k})}
 if(MOD('H'))for(let k=2;k<NP-1;k++){const p=plats[k];if(p.f)continue;if(k%6===2)mkLaser(p,plats[k+1],k);else if(k%6===4)mkRock(p,k)}
-function hurt(){showMsg('被弾！');respawn()}
+function hurt(){if(ADMIN&&ADM.god)return;showMsg('被弾！');respawn()}
 function updHaz(dt){
   for(const L of lasers){const tt=(gt+L.ph)%3,on=tt>=1.8,wn=tt>=1.2&&!on;L.me.visible=on||(wn&&Math.sin(gt*45)>0);L.me.material.opacity=on?1:.45;
     if(on&&P.x+HW>L.hb.x0&&P.x-HW<L.hb.x1&&P.z+HW>L.hb.z0&&P.z-HW<L.hb.z1&&P.y+HH>L.hb.y0&&P.y<L.hb.y1){hurt();return}}
@@ -495,7 +496,7 @@ const AB=[
 {id:12,t:'a',r:4,admin:1,fx:'ts',n:'タイムスキップ',d:'【管理者】時を止める。足場・レーザー・落石・風・ボスが静止し、タイマーも止まる。もう一度押すまで解除されない（制限なし）',dur:1e9,cd:0,m:{}}];
 const abOk=i=>!!AB[i]&&(abOwn.has(i)||(ADMIN&&!!AB[i].admin));
 let apity=ld('hien-apity',0),abOwn=new Set(ld('hien-abown',[])),eqP=ld('hien-eqp',-1),eqA=ld('hien-eqa',-1),PA=null,AA=null,abT=0,abCD=0;
-function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}}
+function recalc(){E={...K,spd:1,inf:0};for(const a of[PA,abT>0?AA:null]){if(!a)continue;for(const k in a.m)E[k]=k==='aj'?E[k]+a.m[k]:E[k]*a.m[k];if(a.inf)E.inf=1}if(ADMIN){E.spd*=ADM.spd;E.g*=ADM.g;if(ADM.aj)E.aj=99;if(ADM.inf)E.inf=1}}
 function setEq(){PA=abOk(eqP)?AB[eqP]:null;AA=abOk(eqA)?AB[eqA]:null;recalc();G('abs').innerHTML='<div><small>常時</small><b>'+(PA?PA.n:'なし')+'</b></div><div><small>発動（Q／能力ボタン）</small><b>'+(AA?AA.n:'なし')+'</b></div>'}
 function useAb(){if(started&&!finished&&AA&&AA.fx==='ts'&&abT>0){abT=0;tsOn(false);return}
   if(!started||finished||!AA||abT>0||abCD>0||BH)return;
@@ -513,7 +514,7 @@ G('alist').onclick=e=>{const c=e.target.closest('.acard');if(!c||c.dataset.id===
   sv('hien-eqp',eqP);sv('hien-eqa',eqA);setEq();renderAb()};
 G('ab2').onclick=()=>{G('ac').style.display='block';G('amsg').textContent='ガチャで入手したアビリティを装備できます。';renderAb()};
 G('ax').onclick=()=>{G('ac').style.display='none'};
-G('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;for(const x of['p1','p2','p3','p4'])G(x).style.display=x===t.dataset.p?'block':'none';for(const b of G('tabs').children)b.classList.toggle('on',b===t)});
+G('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;for(const x of['p1','p2','p3','p4','pa']){const el=G(x);if(el)el.style.display=x===t.dataset.p?'block':'none'}for(const b of G('tabs').children)b.classList.toggle('on',b===t)});
 // ガチャ
 const RATE=[55.2,28,12,4.5,.3];
 function gRoll(guar){const w=RATE.slice();if(guar){w[0]=w[1]=0}const sum=w.reduce((a,b)=>a+b),x=Math.random()*sum;let a=0,r=0;for(;r<4;r++){a+=w[r];if(x<a)break}
@@ -625,14 +626,21 @@ const keys={};
 const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
 function reset(){P.x=cps[0].x;P.y=1;P.z=cps[0].z;P.vx=P.vy=P.vz=0;P.ride=null;cp=0;t=0;running=false;finished=false;yaw=SG.yaw0||0;pitch=0;dashes=2;airJump=E.aj;boostT=0;runT=0;hop=0;abT=0;abCD=0;rec=[];admUsed=false;BH=null;if(admReady){tsOn(false);bhFxOff()}if(BOSS){BOSS.s=-34;updBoss(1)}for(const R of rocks){R.st=0;R.tm=1.2+Math.random()*2;R.g.visible=false;R.mk.visible=false}
   for(const b of vns){b.st=0;b.tm=0;vis(b,true);b.me.material.opacity=1}}
-function respawn(){if(MS.has('O')){reset();hookT=null;dashT=0;fly=0;showMsg('ミス！最初から');return}const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;if(c.b){P.x=(c.b.x0+c.b.x1)/2;P.z=(c.b.z0+c.b.z1)/2}for(const b of vns){b.st=0;vis(b,true);b.me.material.opacity=1}if(BOSS){BOSS.s=Math.min(BOSS.s,c.s-32);updBoss(1)}P.vx=P.vy=P.vz=0;P.ride=null;dashT=0;boostT=0;runT=0;hop=0;fly=0;hookT=null}
+function respawn(){if(MS.has('O')&&!(ADMIN&&ADM.god)){reset();hookT=null;dashT=0;fly=0;showMsg('ミス！最初から');return}const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;if(c.b){P.x=(c.b.x0+c.b.x1)/2;P.z=(c.b.z0+c.b.z1)/2}for(const b of vns){b.st=0;vis(b,true);b.me.material.opacity=1}if(BOSS){BOSS.s=Math.min(BOSS.s,c.s-32);updBoss(1)}P.vx=P.vy=P.vz=0;P.ride=null;dashT=0;boostT=0;runT=0;hop=0;fly=0;hookT=null}
 reset();
 // 入力
 const ov=$('ov');let paused=false;
-(function(){let n=0,tm=0;G('ttl').addEventListener('click',()=>{n++;clearTimeout(tm);tm=setTimeout(()=>n=0,1500);if(n>=7){n=0;let on=false;try{on=localStorage.getItem('hien-admin')!=='1';on?localStorage.setItem('hien-admin','1'):localStorage.removeItem('hien-admin')}catch(e){}alert(on?'管理者モード ON：アビリティ画面に「ブラックホール」「タイムスキップ」が表示されます':'管理者モード OFF');__restart(location.search||'?')}})})();
+G('ttl').addEventListener('click',()=>{
+  if(ADMIN){if(confirm('管理者モードをOFFにしますか？')){try{localStorage.removeItem('hien-admin')}catch(e){}__restart(location.search||'?')}return}
+  const v=prompt('パスワードを入力してください');if(v===null)return;
+  let h=5381;for(const c of v)h=((h<<5)+h+c.charCodeAt(0))>>>0;
+  if(h===2089586311){try{localStorage.setItem('hien-admin','1')}catch(e){}alert('管理者モード ON');__restart(location.search||'?')}else alert('パスワードが違います')});
 function setPause(v){if(!started||finished||paused===v)return;paused=v;$('ps').style.display=v?'flex':'none';if(v){hookHeld=false;drag=false;for(const k in keys)keys[k]=false;document.exitPointerLock&&document.exitPointerLock()}else if(!isTouch){try{R.domElement.requestPointerLock()}catch(e){}}}
 $('pb').addEventListener('click',()=>setPause(true));document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&started&&!finished&&!paused&&!BH&&!isTouch)setPause(true)});$('pr').addEventListener('click',()=>setPause(false));
 $('pt').addEventListener('click',()=>{reset();setPause(false)});$('ph').addEventListener('click',()=>{__restart('?s='+SI+sq)});
+if(ADMIN){const mk=(txt,fn)=>{const d=document.createElement('div');d.className='pbt d';d.textContent=txt;d.addEventListener('click',fn);$('ps').insertBefore(d,$('ph'))};
+  mk('ADMIN：ゴールへ飛ぶ',()=>{P.x=goal.x;P.y=goal.y+.5;P.z=goal.z;P.vx=P.vy=P.vz=0;admUsed=true;setPause(false)});
+  mk('ADMIN：次のチェックポイントへ',()=>{cp=Math.min(cp+1,cps.length-1);const c=cps[cp];P.x=c.x;P.y=c.y+.5;P.z=c.z;P.vx=P.vy=P.vz=0;admUsed=true;setPause(false)})}
 function begin(){started=true;ov.style.display='none';$('pb').style.display='flex';
   if(isTouch){try{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d)}catch(e){}
     try{screen.orientation.lock('landscape').catch(()=>{})}catch(e){}return}
@@ -708,6 +716,7 @@ function step(dt){
   if(!started||finished)return;
   if(isTouch&&innerHeight>innerWidth)return;
   const tfz=!!(AA&&AA.fx==='ts'&&abT>0),wdt=tfz?0:dt;
+  if(ADMIN&&(ADM.god||ADM.aj||ADM.inf||ADM.spd!==1||ADM.g!==1||ADM.slow!==1))admUsed=true;
   jbuf-=dt;coyote-=dt;wallT-=dt;dashT-=dt;dashJ-=dt;boostT-=dt;padCD-=dt;fly-=dt;gt+=wdt;abT-=dt;abCD-=dt;recalc();
   if(tfz){if(abT<=0)tsOn(false);}
   if(BH){stepBH(dt);return}landT=grounded?landT+dt:0;
@@ -792,7 +801,7 @@ function step(dt){
   // チェックポイント
   for(let i=cp+1;i<cps.length;i++){const c=cps[i];if(Math.abs(P.x-c.x)<5&&Math.abs(P.z-c.z)<5&&Math.abs(P.y-c.y)<1.2){cp=i}}
   if(P.y<cps[cp].y+killY)respawn();
-  if(BOSS&&running&&BOSS.p){const b=BOSS.p,gp=(P.x-b.x)*b.dx+(P.z-b.z)*b.dz;if(gp<2&&Math.hypot(P.x-b.x,P.z-b.z)<80){showMsg('喰われた！');respawn()}}
+  if(BOSS&&running&&BOSS.p){const b=BOSS.p,gp=(P.x-b.x)*b.dx+(P.z-b.z)*b.dz;if(gp<2&&Math.hypot(P.x-b.x,P.z-b.z)<80&&!(ADMIN&&ADM.god)){showMsg('喰われた！');respawn()}}
   if(Math.hypot(P.x-goal.x,P.z-goal.z)<6&&Math.abs(P.y-goal.y)<1.5)finish();
 }
 // ===== 管理者アビリティ：ブラックホール／タイムスキップ =====
@@ -859,6 +868,27 @@ function bhFx(dt){
     const rr=q.r;bhPos[i*3]=Math.cos(q.a)*rr;bhPos[i*3+1]=q.y*(rr/(R0*3));bhPos[i*3+2]=Math.sin(q.a)*rr;
     const hh=Math.max(0,Math.min(1,1-(rr/R0-1)/4.4));bhCol[i*3]=1;bhCol[i*3+1]=.35+.6*hh;bhCol[i*3+2]=.1+.7*hh*hh+(hh<.25?.5:0)}
   bhGeo.attributes.position.needsUpdate=true;bhGeo.attributes.color.needsUpdate=true;bhPts.material.size=(.5+.35*ease)*Math.max(.5,bhSc)}
+if(ADMIN){
+  const tb=document.createElement('span');tb.className='tab';tb.dataset.p='pa';tb.textContent='ADMIN';G('tabs').appendChild(tb);
+  const pa=document.createElement('div');pa.id='pa';pa.className='pane';G('body').appendChild(pa);
+  const svA=()=>{try{localStorage.setItem('hien-adm',JSON.stringify(ADM))}catch(e){}recalc()};
+  const TG=[['god','無敵','被弾・ボスに捕まっても何も起きない'],['aj','無限空中ジャンプ','空中で何度でもジャンプできる'],['inf','ダッシュ無制限','ダッシュ回数の制限なし']];
+  const SL=[['spd','移動速度',.5,3,.1],['g','重力',0,1.5,.05],['slow','ゲーム速度（スロー）',.1,1,.05]];
+  const BT=[['coin','コイン +10000','ガチャ用'],['stg','全ステージ解放','ランクに関係なく全て開く'],['all','全キャラ・全アビリティ解放','ガチャなしで全部入手'],['rec','ベスト・ゴーストを初期化','全ステージの記録を削除'],['rst','チートを全てOFF','数値も初期値に戻す']];
+  const draw=()=>{pa.innerHTML='<div class="lbl2">ADMIN　チート（使うとその走りは記録対象外）</div>'+TG.map(([k,n,d])=>'<span class="mc'+(ADM[k]?' on':'')+'" data-t="'+k+'"><b>'+n+'</b><small>'+d+'</small><em>'+(ADM[k]?'ON':'OFF')+'</em></span>').join('')
+    +'<div class="lbl2">数値</div>'+SL.map(([k,n,mn,mx,st])=>'<div style="margin:6px 0;font-weight:900">'+n+'　<span id="av-'+k+'">×'+(+ADM[k]).toFixed(2)+'</span><br><input type="range" data-k="'+k+'" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+ADM[k]+'" style="width:100%;max-width:420px"></div>').join('')
+    +'<div class="lbl2">ツール</div>'+BT.map(([k,n,d])=>'<span class="mc" data-b="'+k+'"><b>'+n+'</b><small>'+d+'</small></span>').join('')+'<div id="amsg2" style="font-weight:900;margin-top:8px"></div>'};
+  const note=m=>{G('amsg2').textContent=m};
+  pa.addEventListener('click',e=>{const c=e.target.closest('.mc');if(!c)return;
+    if(c.dataset.t){ADM[c.dataset.t]=ADM[c.dataset.t]?0:1;svA();draw();return}
+    const b=c.dataset.b;
+    if(b==='coin'){coin+=10000;sv('hien-coin',coin);updCoin();note('コイン +10000（所持 '+coin+'）')}
+    else if(b==='stg'){try{for(let i=0;i<STG.length;i++)localStorage.setItem('hien-rk'+i,'S')}catch(x){}__restart(location.search||'?')}
+    else if(b==='all'){CH.forEach((_,i)=>own.add(i));AB.forEach(a=>{if(!a.admin)abOwn.add(a.id)});sv('hien-own',[...own]);sv('hien-abown',[...abOwn]);drawCh();renderAb();setEq();note('全キャラ・全アビリティを解放しました')}
+    else if(b==='rec'){if(!confirm('全ステージのベストタイムとゴーストを削除します。よろしいですか？'))return;try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(/^hien-(best|gh-)/.test(k))localStorage.removeItem(k)}}catch(x){}GH=null;note('記録を初期化しました')}
+    else if(b==='rst'){Object.assign(ADM,{god:0,aj:0,inf:0,spd:1,g:1,slow:1});svA();draw()}});
+  pa.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;ADM[k]=+e.target.value;G('av-'+k).textContent='×'+ADM[k].toFixed(2);svA()});
+  draw()}
 admReady=true;
 function finish(){
   finished=true;let best=null,isNew=false;
@@ -876,7 +906,7 @@ let dead=false;__td=()=>{dead=true;try{R.dispose();const gl=R.getContext(),x=gl&
 let last=performance.now();
 function loop(now){
   if(dead)return;
-  let dt=Math.min((now-last)/1000,.05);last=now;
+  let dt=Math.min((now-last)/1000,.05);last=now;if(ADMIN)dt*=ADM.slow;
   const n=Math.ceil(dt/.0167)||1;if(!paused)for(let i=0;i<n;i++)step(dt/n);
   const sp=Math.hypot(P.vx,P.vz);
   fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
