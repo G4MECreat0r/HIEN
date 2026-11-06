@@ -82,6 +82,12 @@ body.touch #cd{margin-bottom:8px}
 #cs{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;margin:0 0 14px;font-size:11px}
 .st{display:flex;align-items:center;gap:8px}.st span{flex:0 0 6em;font-weight:700}
 .bar{flex:1;height:7px;background:rgba(21,25,34,.15);transform:skewX(-30deg);overflow:hidden}.bar i{display:block;height:100%}
+.st.ovs .bar{margin-right:36px}.ob{font-size:.85em;font-weight:900;color:#e23a52;font-variant-numeric:tabular-nums;margin-left:3px}
+.bar.ov{overflow:visible;position:relative;box-shadow:0 0 8px 1px rgba(242,183,5,.75)}
+.bar.ov i{background:linear-gradient(90deg,#f2b705,#ff2a55)!important;animation:ovp .9s ease-in-out infinite alternate}
+.bar.ov::after{content:'';position:absolute;left:100%;top:-3px;height:13px;width:min(calc(var(--ov)*100%),34px);background:linear-gradient(90deg,#ff2a55,rgba(255,42,85,0));box-shadow:0 0 12px #ff2a55;animation:ovf .6s ease-in-out infinite alternate}
+@keyframes ovp{to{filter:brightness(1.4)}}@keyframes ovf{to{opacity:.5}}
+#glim{display:none;border:3px solid #ff2a55;background:#151922;color:#ecebe4;padding:8px 12px;margin:0 0 10px;font-size:13px;font-weight:900;line-height:1.6}#glim b{color:#f2c230}
 #abh{position:absolute;left:20px;bottom:36px;font-size:13px;font-weight:900;letter-spacing:.05em}
 #fx{position:fixed;inset:0;pointer-events:none;transition:box-shadow .3s;box-shadow:inset 0 0 0 0 rgba(242,194,48,0)}
 #fx.on{box-shadow:inset 0 0 140px 20px rgba(242,194,48,.45)}
@@ -163,7 +169,7 @@ body.ts canvas{filter:grayscale(1) contrast(1.25)}body.tsx canvas{filter:invert(
 <div id="main"><div id="top"><div id="tabs"><span class="tab on" data-p="p1">ステージ</span><span class="tab" data-p="p2">キャラ</span><span class="tab" data-p="p3">アビリティ</span><span class="tab" data-p="p4">操作</span></div><span id="gb">ガチャ ◆<span id="coin">0</span></span></div><div id="body"><div id="p1" class="pane"><p id="lead">止まったら落ちる。壁を蹴り、空を引き寄せ、最速で駆け抜けろ。RANK B以上で次のステージが開く。</p><div id="stages"></div><div id="tgt"></div><div class="lbl2">MODIFIER　付けるほどコイン倍率UP</div><div id="mods"></div><div id="mtot"></div></div><div id="p2" class="pane"><div id="chars"></div><div id="cd"></div><div id="cs"></div></div><div id="p3" class="pane"><div id="abs"></div><span id="ab2">アビリティ編成</span><p class="note">アビリティはガチャで入手します。</p></div><div id="p4" class="pane"><p>壁でも足場でも、狙った場所にワイヤーを撃てる。黄色い結晶は吸着ポイント。ワイヤーは巻き取りながら振り子のように振れ、離した瞬間に勢いのまま飛び出す。</p><p>青いパッドは加速、黄色いパッドはジャンプ台。橙の足場は乗ると崩れ、黒い足場は動く。コースのどこかに、隠された大ジャンプの道がある。見つければ一気に進める。</p><p>モディファイア：ステージ画面で、風・ワイヤー禁止・回転壁・夜・レーザー／落石・ワンミス即やり直しを好きに足せる。付けた分だけクリア時のコインが増える。ボスステージ「追跡」は、背後から迫る巨大な壁から逃げ切れ。ベスト更新時の走りはゴーストとして次回に再生される。</p><p class="tp">ダッシュ直後に「跳ぶ」で加速ジャンプ。左で移動、右スワイプで視点。「ワイヤー」を押し続けると、狙った壁や足場に刺さって巻き取り・スイングできる。着地の瞬間に「跳ぶ」で連続ホップ。走り続けるほど速くなる。ワイヤー中に「ダッシュ」でワイヤーダッシュ。</p><dl><dt>WASD</dt><dd>移動</dd><dt>Space</dt><dd>ジャンプ（空中でもう一回／壁で蹴り上がり）</dd><dt>Shift</dt><dd>エアダッシュ（視線方向・2回、着地で回復）。ダッシュ中か直後に Space で加速ジャンプ</dd><dt>左クリック / E</dt><dd>立体機動：狙った壁・足場にワイヤー射出。押し続けて巻き取り・スイング、離して射出</dd><dt>加速</dt><dd>走り続けるほど最高速が伸びる／着地の瞬間にSpaceで連続ホップ／ワイヤー中にShiftでワイヤーダッシュ、進行方向キーで振り子を加速、0.25秒以上掴んで離すと勢いが乗る／壁蹴りは速度を保つ</dd><dt>R</dt><dd>最初から</dd></dl></div></div><div id="act"><span id="go">START</span><a id="rnd" href="#">ランダムコース</a></div></div></div>
 <div id="tc"><div id="sz"></div><div id="lz"></div><div id="base"><div id="knob"></div></div><div class="tb" id="bJ">跳ぶ</div><div class="tb" id="bD">ダッシュ</div><div class="tb" id="bA">能力</div><div class="tb" id="bH" style="font-size:12px">ワイヤー</div></div>
 <div id="gc"><div id="gci"><div id="gh"><b>GACHA</b><span id="gcoin"></span><span id="gx">✕ 戻る</span></div>
-<div id="gm"><span class="gmb on" data-m="c">キャラ</span><span class="gmb" data-m="a">アビリティ</span></div><div id="gp"></div><div id="gbt"><span class="gbtn" id="g1">1回　◆100</span><span class="gbtn" id="g10">10連　◆900</span></div>
+<div id="gm"><span class="gmb on" data-m="c">キャラ</span><span class="gmb" data-m="a">アビリティ</span></div><div id="glim"></div><div id="gp"></div><div id="gbt"><span class="gbtn" id="g1">1回　◆100</span><span class="gbtn" id="g10">10連　◆900</span></div>
 <div id="gres"></div><div id="grate"></div><div id="lbl" style="margin-top:16px">COLLECTION</div><div id="gown"></div></div></div>
 <div id="ac"><div id="aci"><div id="ah"><b>ABILITY</b><span id="acoin"></span><span id="ax">✕ 戻る</span></div>
 <div id="amsg"></div><div id="alist"></div></div></div>
@@ -457,6 +463,7 @@ SG.len=plats.reduce((a,p,i)=>i?a+Math.hypot(p.x-plats[i-1].x,p.z-plats[i-1].z,(p
 const RT=(SG.rk||[26,19,14]).map(v=>SG.len/v),rankOf=t=>t<=RT[0]?'S':t<=RT[1]?'A':t<=RT[2]?'B':'C';
 document.getElementById('tgt').textContent='目標タイム  S '+RT[0].toFixed(1)+'秒  A '+RT[1].toFixed(1)+'秒  B '+RT[2].toFixed(1)+'秒';
 const G=id=>document.getElementById(id),FN='"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
+const rn=c=>c.lim?'LIMITED':RN[+c.r];
 const RN=['N','R','SR','SSR','SECRET'],RC=['#8d9a94','#3f8cff','#a855f7','#f2b705','#ff2a55'];
 const CH=[
 {n:'標準',r:0,d:'クセのない万能型',run:1,air:1,aj:1,g:1,ha:1.6,hc:26,hk:1,hcap:38,rel:1.15,wk:1.05,dv:1,dd:1},
@@ -471,7 +478,9 @@ const CH=[
 {n:'夜鴉',r:2,d:'ワイヤーと空中の達人',run:1,air:1.3,aj:2,g:.92,ha:1.6,hc:26,hk:1.6,hcap:48,rel:1.35,wk:1.1,dv:1.1,dd:1.15},
 {n:'神風',r:3,d:'全能力が高水準の天才',run:1.7,air:1.4,aj:2,g:.9,ha:3.4,hc:36,hk:1.2,hcap:44,rel:1.25,wk:1.2,dv:1.35,dd:1.25},
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
-{n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5}];
+{n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
+{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを突き抜ける。他の能力はやや高め',run:3.6,air:1.2,aj:1,g:.96,ha:2,hc:30,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05}];
+const LIM={id:CH.length-1,until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.03,pity:50},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
 if(Q.get('coins')||/^#(coins|all)$/.test(location.hash)){coin=+Q.get('coins')||99999;sv('hien-coin',coin)}
@@ -479,8 +488,8 @@ let CHI=ld('hien-ch',0);if(!own.has(CHI))CHI=0;
 let K=CH[CHI];
 let E={...K,spd:1,inf:0};
 const SS=[['走力',c=>c.run/2],['空中操作',c=>c.air/2.3],['空中ジャンプ',c=>c.aj/3],['軽さ',c=>(1.12-c.g)/.32],['ホップ加速',c=>c.ha/4],['ワイヤー',c=>c.hk/2],['ダッシュ',c=>c.dv*c.dd/2.4],['壁蹴り',c=>(c.wk-.9)/.5]];
-const statsHTML=c=>SS.map(([l,f])=>'<div class="st"><span>'+l+'</span><div class="bar"><i style="width:'+Math.round(Math.max(.04,Math.min(1,f(c)))*100)+'%;background:'+RC[c.r]+'"></i></div></div>').join('');
-function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+RN[CH[i].r]+'</i>'+CH[i].n+'</span>').join('');G('cd').textContent='['+RN[E.r]+'] '+E.n+'　'+E.d+'　所持 '+own.size+'/'+CH.length;G('cs').innerHTML=statsHTML(K)}
+const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
+function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');G('cd').textContent='['+rn(E)+'] '+E.n+'　'+E.d+'　所持 '+own.size+'/'+CH.length;G('cs').innerHTML=statsHTML(K)}
 G('chars').addEventListener('click',e=>{const c=e.target.closest('.ch');if(!c)return;CHI=+c.dataset.i;K=CH[CHI];sv('hien-ch',CHI);recalc();drawCh()});
 // アビリティ（キャラとは別枠：パッシブ1つ＋アクティブ1つ）
 const AB=[
@@ -525,14 +534,15 @@ G('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)re
 // ガチャ
 const RATE=[55.2,28,12,4.5,.3];
 function gRoll(guar){const w=RATE.slice();if(guar){w[0]=w[1]=0}const sum=w.reduce((a,b)=>a+b),x=Math.random()*sum;let a=0,r=0;for(;r<4;r++){a+=w[r];if(x<a)break}
-  const pool=CH.map((c,i)=>i).filter(i=>CH[i].r===r);return pool[Math.floor(Math.random()*pool.length)]}
+  const pool=CH.map((c,i)=>i).filter(i=>CH[i].r===r&&!CH[i].lim);return pool[Math.floor(Math.random()*pool.length)]}
 function pull(n){const cost=n===1?100:900;if(coin<cost)return null;coin-=cost;const out=[];
-  for(let i=0;i<n;i++){pity++;const gu=pity>=10||(n===10&&i===9&&!out.some(o=>CH[o.id].r>=2)),id=gRoll(gu);if(CH[id].r>=2)pity=0;
+  for(let i=0;i<n;i++){const lo=limOn(),lm=lo&&(lpity>=LIM.pity-1||Math.random()<LIM.rate);if(lm)lpity=0;else if(lo)lpity++;pity++;const gu=pity>=10||(n===10&&i===9&&!out.some(o=>CH[o.id].r>=2)),id=lm?LIM.id:gRoll(gu);if(CH[id].r>=2)pity=0;
     const dup=own.has(id),back=dup?[10,25,60,150,400][CH[id].r]:0;coin+=back;own.add(id);out.push({id,dup,back})}
-  sv('hien-coin',coin);sv('hien-pity',pity);sv('hien-own',[...own]);return out}
-let gmode='c';
+  sv('hien-coin',coin);sv('hien-pity',pity);sv('hien-lpity',lpity);sv('hien-own',[...own]);return out}
+let gmode='c';let lpity=ld('hien-lpity',0);
 function updCoin(){const[c1,c10]=gmode==='c'?[100,900]:[150,1350];G('coin').textContent=coin;G('acoin').textContent='◆ '+coin;G('gcoin').textContent='◆ '+coin;
   G('g1').textContent='1回　◆'+c1;G('g10').textContent='10連　◆'+c10;G('g1').classList.toggle('off',coin<c1);G('g10').classList.toggle('off',coin<c10);
+  const gl=G('glim');if(gmode==='c'&&limOn()){const ms=LIM.until-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);gl.style.display='block';gl.innerHTML='<b>LIMITED</b>　期間限定ピックアップ「雷帝」排出中！<br>走力がゲージを突き抜ける特化型。残り '+d+'日'+h+'時間／排出率 '+Math.round(LIM.rate*100)+'％／'+LIM.pity+'回以内に確定（あと '+(LIM.pity-lpity)+' 回）'}else gl.style.display='none';
   G('gp').textContent='SR以上 確定まであと '+(10-(gmode==='c'?pity:apity))+' 回';
   G('grate').textContent=gmode==='c'?'排出率　N 55.2％／R 28％／SR 12％／SSR 4.5％／SECRET 0.3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。':'排出率　N 55％／R 30％／SR 12％／SSR 3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。'}
 const RATEA=[55,30,12,3];
@@ -543,8 +553,8 @@ function pullA(n){const cost=n===1?150:1350;if(coin<cost)return null;coin-=cost;
     const dup=abOwn.has(id),back=dup?[20,50,120,300][AB[id].r]:0;coin+=back;abOwn.add(id);out.push({id,dup,back})}
   sv('hien-coin',coin);sv('hien-apity',apity);sv('hien-abown',[...abOwn]);return out}
 G('gm').addEventListener('click',e=>{const b=e.target.closest('.gmb');if(!b)return;gmode=b.dataset.m;for(const x of G('gm').children)x.classList.toggle('on',x===b);G('gres').innerHTML='';updCoin();renderOwn()});
-function renderOwn(){const L=gmode==='c'?CH:AB,O=gmode==='c'?own:abOwn;G('gown').innerHTML=L.map((c,i)=>O.has(i)?'<div class="gcard" style="border-color:'+RC[c.r]+'"><small style="color:'+RC[c.r]+'">'+RN[c.r]+(gmode==='a'?(c.t==='p'?' ／ 常時':' ／ 発動'):'')+'</small>'+c.n+'<small>'+c.d+'</small></div>':'<div class="gcard" style="border-style:dashed;border-color:#9aa5a0;color:#9aa5a0">？？？</div>').join('')}
-function showRes(out){const L=gmode==='c'?CH:AB;G('gres').innerHTML=out.map(o=>{const c=L[o.id];return '<div class="gcard" style="border-color:'+RC[c.r]+'"><small style="color:'+RC[c.r]+'">'+RN[c.r]+(o.dup?'':' ／ NEW')+'</small>'+c.n+(o.dup?'<small>かぶり ◆+'+o.back+'</small>':'')+'</div>'}).join('')}
+function renderOwn(){const L=gmode==='c'?CH:AB,O=gmode==='c'?own:abOwn;G('gown').innerHTML=L.map((c,i)=>O.has(i)?'<div class="gcard" style="border-color:'+RC[c.r]+'"><small style="color:'+RC[c.r]+'">'+rn(c)+(gmode==='a'?(c.t==='p'?' ／ 常時':' ／ 発動'):'')+'</small>'+c.n+'<small>'+c.d+'</small></div>':'<div class="gcard" style="border-style:dashed;border-color:#9aa5a0;color:#9aa5a0">？？？</div>').join('')}
+function showRes(out){const L=gmode==='c'?CH:AB;G('gres').innerHTML=out.map(o=>{const c=L[o.id];return '<div class="gcard" style="border-color:'+RC[c.r]+'"><small style="color:'+RC[c.r]+'">'+rn(c)+(o.dup?'':' ／ NEW')+'</small>'+c.n+(o.dup?'<small>かぶり ◆+'+o.back+'</small>':'')+'</div>'}).join('')}
 let busy=0;
 function doPull(n){if(busy)return;const out=gmode==='c'?pull(n):pullA(n);if(!out){G('gres').innerHTML='<p>コインが足りません。ステージをクリアして集めよう。</p>';return}
   busy=1;G('gres').innerHTML='';const L=gmode==='c'?CH:AB,top=out.reduce((a,o)=>L[o.id].r>L[a.id].r?o:a),tc=L[top.id];
