@@ -479,7 +479,7 @@ const CH=[
 {n:'神風',r:3,d:'全能力が高水準の天才',run:1.7,air:1.4,aj:2,g:.9,ha:3.4,hc:36,hk:1.2,hcap:44,rel:1.25,wk:1.2,dv:1.35,dd:1.25},
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
 {n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
-{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05}];
+{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速度に応じて雷光の筋が走る',grip:3.4,glide:1,jb:1,run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05}];
 const LIM={id:CH.length-1,until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
@@ -489,7 +489,7 @@ let K=CH[CHI];
 let E={...K,spd:1,inf:0};
 const SS=[['走力',c=>c.run/2],['空中操作',c=>c.air/2.3],['空中ジャンプ',c=>c.aj/3],['軽さ',c=>(1.12-c.g)/.32],['ホップ加速',c=>c.ha/4],['ワイヤー',c=>c.hk/2],['ダッシュ',c=>c.dv*c.dd/2.4],['壁蹴り',c=>(c.wk-.9)/.5]];
 const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
-function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');G('cd').textContent='['+rn(E)+'] '+E.n+'　'+E.d+'　所持 '+own.size+'/'+CH.length;G('cs').innerHTML=statsHTML(K)}
+function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');G('cd').textContent='['+rn(E)+'] '+E.n+'　'+E.d+(E.sk?'　★'+E.sk:'')+'　所持 '+own.size+'/'+CH.length;G('cs').innerHTML=statsHTML(K)}
 G('chars').addEventListener('click',e=>{const c=e.target.closest('.ch');if(!c)return;CHI=+c.dataset.i;K=CH[CHI];sv('hien-ch',CHI);recalc();drawCh()});
 // アビリティ（キャラとは別枠：パッシブ1つ＋アクティブ1つ）
 const AB=[
@@ -695,7 +695,7 @@ const hookLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THRE
 hookLine.frustumCulled=false;hookLine.visible=false;S.add(hookLine);
 // 状態
 const P={x:0,y:0,z:0,vx:0,vy:0,vz:0,ride:null},HW=.35;let HH=1.8;
-let eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
+let glideT=0,prevGr=false,eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
 let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='',admUsed=false,BH=null,SN=null,admReady=false;
 const keys={};
 const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
@@ -817,9 +817,13 @@ function step(dt){
     if(grounded){const f=boostT>0||jbuf>0?1:Math.max(0,1-9*dt);P.vx*=f;P.vz*=f}
     else if(fly<=0){const f=Math.max(0,1-.25*dt);P.vx*=f;P.vz*=f}
     if(wl>0&&(fly<=0||grounded)){const acc=grounded?(90+runT*70*E.run)*E.spd:36*E.air,tgt=(14+runT*4*E.run)*E.spd,cur=P.vx*wx+P.vz*wz,add=Math.min(Math.max(tgt-cur,0),acc*dt);P.vx+=wx*add;P.vz+=wz*add}
+    if(E.grip&&wl>0&&!hookT&&fly<=0){const h=Math.hypot(P.vx,P.vz);if(h>8){const dx=P.vx/h,dz=P.vz/h,k=Math.min(1,E.grip*(grounded?2:1)*dt),nx=dx+(wx-dx)*k,nz=dz+(wz-dz)*k,nl=Math.hypot(nx,nz);if(nl>.05){P.vx=nx/nl*h;P.vz=nz/nl*h}}}
     // 重力（壁に張り付くと緩やか）
     const onWall=wallT>0&&!grounded&&P.vy<0;
-    P.vy-=(onWall?7:32*SG.gv*E.g)*dt;if(onWall&&P.vy<-4)P.vy=-4;
+    if(E.glide){const hs=Math.hypot(P.vx,P.vz);if(prevGr&&!grounded&&hs>20&&P.vy<=.5&&!hookT)glideT=Math.min(.6,hs/110);if(grounded||P.vy>.5||hookT)glideT=0}else glideT=0;
+    prevGr=grounded;
+    if(glideT>0&&!onWall){glideT-=dt;P.vy=0}else P.vy-=(onWall?7:32*SG.gv*E.g)*dt;
+    if(onWall&&P.vy<-4)P.vy=-4;
   }
   znT='';let wd=null;for(const w of winds)if(Math.hypot(P.x-w.x,P.z-w.z)<w.r&&P.y>w.y0&&P.y<w.y1){wd=w;break}
   if(wd){znT='風：'+wd.nm;if(!grounded&&!dashing&&fly<=0){P.vx+=wd.dx*wd.a*wdt;P.vz+=wd.dz*wd.a*wdt}}
@@ -828,7 +832,7 @@ function step(dt){
   // ジャンプ
   if(jbuf>0){
     if(dashJ>0){const h=Math.hypot(P.vx,P.vz)||1,f=Math.min(h*1.1,27);P.vx*=f/h;P.vz*=f/h;P.vy=13.5;dashT=0;dashJ=0;jbuf=0;coyote=0;grounded=false;showMsg('ダッシュジャンプ！')}
-    else if(coyote>0){P.vy=12.5;jbuf=0;coyote=0;grounded=false;const h=Math.hypot(P.vx,P.vz);if(landT<.1&&h>6){hop=Math.min(hop+1,6);const f=Math.min(h+E.ha,E.hc*E.spd)/h;P.vx*=f;P.vz*=f;if(hop>1)showMsg('ホップ ×'+hop)}else hop=0}
+    else if(coyote>0){P.vy=12.5+(E.jb?Math.min(7,Math.hypot(P.vx,P.vz)*.09):0);jbuf=0;coyote=0;grounded=false;const h=Math.hypot(P.vx,P.vz);if(landT<.1&&h>6){hop=Math.min(hop+1,6);const f=Math.min(h+E.ha,E.hc*E.spd)/h;P.vx*=f;P.vz*=f;if(hop>1)showMsg('ホップ ×'+hop)}else hop=0}
     else if(wallT>0){P.vx=wnx*11+P.vx*E.wk;P.vz=wnz*11+P.vz*E.wk;const h=Math.hypot(P.vx,P.vz);if(h>30){P.vx*=30/h;P.vz*=30/h}P.vy=13;jbuf=0;wallT=0;airJump=E.aj}
     else if(airJump>0){P.vy=12;airJump--;jbuf=0;const f=Math.hypot(P.vx,P.vz);if(wl>0&&f<14){P.vx=wx*14;P.vz=wz*14}}
   }
@@ -968,7 +972,7 @@ if(ADMIN){
   pa.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.k;if(!k)return;ADM[k]=+e.target.value;G('av-'+k).textContent='×'+ADM[k].toFixed(2);svA()});
   draw()}
 // ===== ハイパードライブ（ワープトンネル） =====
-const HD={on:false,a:0,t:0};if(!C.parent)S.add(C);
+const HD={on:false,a:0,t:0,s:0};if(!C.parent)S.add(C);
 const HDV='varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
 const HDF='varying vec2 vUv;uniform float uT;uniform float uA;float hs(float n){return fract(sin(n*12.9898)*43758.5453);}void main(){float id=floor(vUv.x*110.);float h=hs(id);float h2=hs(id+7.3);float y=fract(vUv.y*(1.5+h*3.5)-uT*(2.2+h*5.)+h2*9.);float st=smoothstep(0.,.03,y)*(1.-smoothstep(.03,.55,y));float w=.55+.45*sin(uT*3.+id);vec3 c=mix(vec3(.15,.85,1.),vec3(1.,.25,.85),h2);c=mix(c,vec3(1.),pow(st,3.)*.6);float edge=.25+.75*vUv.y;gl_FragColor=vec4(c*st*(1.4+w),st*edge*uA*.95);}';
 const hdTun=new THREE.Mesh(new THREE.CylinderGeometry(5.5,5.5,70,64,1,true),new THREE.ShaderMaterial({uniforms:{uT:{value:0},uA:{value:0}},vertexShader:HDV,fragmentShader:HDF,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false,side:THREE.BackSide}));
@@ -982,11 +986,12 @@ function hdOn(on){HD.on=on;G('hdv').classList.toggle('on',on)}
 function hdFx(dt){
   if(HD.on&&!(AA&&AA.fx==='hd'&&abT>0))hdOn(false);
   HD.a+=((HD.on?1:0)-HD.a)*Math.min(1,dt*5);if(!HD.on&&HD.a<.01)HD.a=0;
-  const vis=HD.a>0;hdTun.visible=hdLines.visible=vis;if(!vis)return;
-  HD.t+=dt;hdTun.material.uniforms.uT.value=HD.t;hdTun.material.uniforms.uA.value=HD.a;hdLines.material.opacity=HD.a;
-  const sp=Math.hypot(P.vx,P.vz),v=(70+Math.min(60,sp*2.4))*(.6+.4*HD.a);
+  const sp=Math.hypot(P.vx,P.vz);HD.s=(E.grip&&started&&!finished&&!BH&&!SN)?Math.max(0,Math.min(1,(sp-35)/45))*.65:0;const aa=Math.max(HD.a,HD.s);
+  const vis=aa>.01;hdTun.visible=hdLines.visible=vis;if(!vis)return;
+  HD.t+=dt;hdTun.material.uniforms.uT.value=HD.t;hdTun.material.uniforms.uA.value=aa;hdLines.material.opacity=aa;
+  const v=(70+Math.min(60,sp*2.4))*(.6+.4*aa);
   for(let i=0;i<HN;i++){const q=hdL[i];q.z+=v*q.sp*dt;if(q.z>-1){q.z=-42-Math.random()*8;const a=Math.random()*6.283,r=1.8+Math.random()*5;q.x=Math.cos(a)*r;q.y=Math.sin(a)*r}
-    hdPos[i*6]=q.x;hdPos[i*6+1]=q.y;hdPos[i*6+2]=q.z;hdPos[i*6+3]=q.x;hdPos[i*6+4]=q.y;hdPos[i*6+5]=q.z-q.l*(.5+HD.a)}
+    hdPos[i*6]=q.x;hdPos[i*6+1]=q.y;hdPos[i*6+2]=q.z;hdPos[i*6+3]=q.x;hdPos[i*6+4]=q.y;hdPos[i*6+5]=q.z-q.l*(.5+aa)}
   hdGeo.attributes.position.needsUpdate=true}
 // ===== 超新星 =====
 const SNV={on:false,t:0,x:0,y:0,z:0,sh:0,fv:0,flash:false};
@@ -1046,7 +1051,7 @@ function loop(now){
   let dt=Math.min((now-last)/1000,.05);last=now;if(ADMIN)dt*=ADM.slow;
   const n=Math.max(Math.ceil(dt/.0167)||1,Math.ceil(Math.hypot(P.vx,P.vy,P.vz)*dt/.45));if(!paused)for(let i=0;i<n;i++)step(dt/n);
   const sp=Math.hypot(P.vx,P.vz);
-  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0)+HD.a*40+(SNV.on?SNV.fv:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
+  fov+=((76+Math.min(sp,36)*.75+(dashT>0?10:0)+(abT>0?8:0)+(BH?Math.min(1,BH.t/BH.T)*34:0)+HD.a*40+HD.s*16+(SNV.on?SNV.fv:0))-fov)*Math.min(1,dt*8);C.fov=fov;C.updateProjectionMatrix();
   roll+=((-wallSide*.16)-roll)*Math.min(1,dt*10);
   eyeH+=(1.6-eyeH)*Math.min(1,dt*14);C.position.set(P.x,P.y+eyeH,P.z);if(BH){const k=.05+.5*Math.min(1,BH.t/BH.T);C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}
   if(SNV.on&&SNV.sh>0){const k=SNV.sh;C.position.x+=(Math.random()-.5)*k;C.position.y+=(Math.random()-.5)*k;C.position.z+=(Math.random()-.5)*k}C.rotation.set(pitch,yaw,roll);if(!(AA&&AA.fx==='ts'&&abT>0)&&!paused)vt+=dt;bhFx(paused?0:dt);hdFx(paused?0:dt);snFx(paused?0:dt);updWinds();if(PL)PL.position.set(P.x,P.y+3,P.z);
