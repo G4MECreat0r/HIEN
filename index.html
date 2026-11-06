@@ -480,7 +480,7 @@ const CH=[
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
 {n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
 {n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05}];
-const LIM={id:CH.length-1,until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.006,pity:150},limOn=()=>Date.now()<LIM.until;
+const LIM={id:CH.length-1,until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
 if(Q.get('coins')||/^#(coins|all)$/.test(location.hash)){coin=+Q.get('coins')||99999;sv('hien-coin',coin)}
@@ -542,7 +542,7 @@ function pull(n){const cost=n===1?100:900;if(coin<cost)return null;coin-=cost;co
 let gmode='c';let lpity=ld('hien-lpity',0);
 function updCoin(){const[c1,c10]=gmode==='c'?[100,900]:[150,1350];G('coin').textContent=coin;G('acoin').textContent='◆ '+coin;G('gcoin').textContent='◆ '+coin;
   G('g1').textContent='1回　◆'+c1;G('g10').textContent='10連　◆'+c10;G('g1').classList.toggle('off',coin<c1);G('g10').classList.toggle('off',coin<c10);
-  const gl=G('glim');if(gmode==='c'&&limOn()){const ms=LIM.until-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);gl.style.display='block';gl.innerHTML='<b>LIMITED</b>　期間限定ピックアップ「雷帝」排出中！<br>走力がゲージを遥かに突き抜ける特化型。残り '+d+'日'+h+'時間／排出率 '+(LIM.rate*100).toFixed(1)+'％／'+LIM.pity+'回以内に確定（あと '+(LIM.pity-lpity)+' 回）'}else gl.style.display='none';
+  const gl=G('glim');if(gmode==='c'&&limOn()){const ms=LIM.until-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);gl.style.display='block';gl.innerHTML='<b>LIMITED</b>　期間限定ピックアップ「雷帝」排出中！<br>走力がゲージを遥かに突き抜ける特化型。残り '+d+'日'+h+'時間／排出率 '+(LIM.rate*100).toFixed(2)+'％／'+LIM.pity+'回以内に確定（あと '+(LIM.pity-lpity)+' 回）'}else gl.style.display='none';
   G('gp').textContent='SR以上 確定まであと '+(10-(gmode==='c'?pity:apity))+' 回';
   G('grate').textContent=gmode==='c'?'排出率　N 55.2％／R 28％／SR 12％／SSR 4.5％／SECRET 0.3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。':'排出率　N 55％／R 30％／SR 12％／SSR 3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。'}
 const RATEA=[55,30,12,3];
@@ -557,8 +557,8 @@ function renderOwn(){const L=gmode==='c'?CH:AB,O=gmode==='c'?own:abOwn;G('gown')
 function showRes(out){const L=gmode==='c'?CH:AB;G('gres').innerHTML=out.map(o=>{const c=L[o.id];return '<div class="gcard" style="border-color:'+RC[c.r]+'"><small style="color:'+RC[c.r]+'">'+rn(c)+(o.dup?'':' ／ NEW')+'</small>'+c.n+(o.dup?'<small>かぶり ◆+'+o.back+'</small>':'')+'</div>'}).join('')}
 let busy=0;
 function doPull(n){if(busy)return;const out=gmode==='c'?pull(n):pullA(n);if(!out){G('gres').innerHTML='<p>コインが足りません。ステージをクリアして集めよう。</p>';return}
-  busy=1;G('gres').innerHTML='';const L=gmode==='c'?CH:AB,top=out.reduce((a,o)=>L[o.id].r>L[a.id].r?o:a),tc=L[top.id];
-  movie({n:tc.n,d:tc.d,r:tc.r},()=>{busy=0;showRes(out);updCoin();renderOwn();drawCh();setEq()})}
+  busy=1;G('gres').innerHTML='';const L=gmode==='c'?CH:AB,top=out.reduce((a,o)=>L[o.id].r+(L[o.id].lim?.5:0)>L[a.id].r+(L[a.id].lim?.5:0)?o:a),tc=L[top.id];
+  movie({n:tc.n,d:tc.d,r:tc.r,lim:tc.lim},()=>{busy=0;showRes(out);updCoin();renderOwn();drawCh();setEq()})}
 G('gb').onclick=()=>{G('gc').style.display='block';G('gres').innerHTML='';updCoin();renderOwn()};
 G('gx').onclick=()=>{G('gc').style.display='none';drawCh();updCoin()};
 G('g1').onclick=()=>doPull(1);G('g10').onclick=()=>doPull(10);
