@@ -847,14 +847,17 @@ function step(dt){
   for(const a of anchors){a.rotation.y+=dt;a.scale.setScalar(1);
     const dx=a.position.x-ex,dy=a.position.y-ey,dz=a.position.z-ez,l=Math.hypot(dx,dy,dz);
     if(l>60*(E.hr||1))continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
-  if(tgt&&!hookHeld)tgt.scale.setScalar(1.9);
+  let gLock=false;
+  if(E.hr&&started){const gx=goal.x-ex,gy=goal.y+5-ey,gz=goal.z-ez,gl=Math.hypot(gx,gy,gz);if(gl>6&&gl<180&&(gx*cx+gy*cy+gz*cz)/gl>.5)gLock=true}
+  if(tgt&&!hookHeld&&!gLock)tgt.scale.setScalar(1.9);
   $('hint').style.opacity=0;
   const cb=E.hr?1+.05*Math.min(wch,8):1;hookLine.material.color.setHex(E.hr?0xb36bff:INK);
   if(E.hr&&wch>1&&!grounded)znT+=(znT?'　':'')+'連鎖 ×'+wch;
   if(BWIRE){if(hookHeld){if(!BH&&!bwLatch&&started){bwLatch=true;admUsed=true;startBH('bw')}}else bwLatch=false}
   if(hookHeld&&started&&!nwz&&!BWIRE){
     if(!hookT){let H=null;
-      if(tgt)H=tgt.position.clone();
+      if(gLock){H=new THREE.Vector3(goal.x,goal.y+5,goal.z);showMsg('ゴールロック')}
+      else if(tgt)H=tgt.position.clone();
       else{const RG=75*(E.hr||1);let bt=RG;for(const b of boxes){if(b.st===2)continue;const t2=rayBox(ex,ey,ez,cx,cy,cz,b,RG);if(t2!==null&&t2<bt)bt=t2}if(bt<RG)H=new THREE.Vector3(ex+cx*bt,ey+cy*bt,ez+cz*bt)}
       if(H){hookT={position:H,L:H.distanceTo(new THREE.Vector3(ex,ey,ez)),age:0};dashes=2;airJump=E.aj;if(E.hr)wch=grounded?1:wch+1}}
   }else if(hookT){const h=Math.hypot(P.vx,P.vy,P.vz);if(hookT.age>.25&&h>12){const f=Math.min(h*E.rel*cb,E.hcap*cb)/h;P.vx*=f;P.vy*=f;P.vz*=f;showMsg('リリース！')}hookT=null}
@@ -888,7 +891,7 @@ function step(dt){
   for(let i=cp+1;i<cps.length;i++){const c=cps[i];if(Math.abs(P.x-c.x)<5&&Math.abs(P.z-c.z)<5&&Math.abs(P.y-c.y)<1.2){cp=i}}
   if(P.y<cps[cp].y+killY)respawn();
   if(BOSS&&running&&BOSS.p){const b=BOSS.p,gp=(P.x-b.x)*b.dx+(P.z-b.z)*b.dz;if(gp<2&&Math.hypot(P.x-b.x,P.z-b.z)<80&&!(ADMIN&&ADM.god)){showMsg('喰われた！');respawn()}}
-  if(Math.hypot(P.x-goal.x,P.z-goal.z)<6&&Math.abs(P.y-goal.y)<1.5)finish();
+  if((Math.hypot(P.x-goal.x,P.z-goal.z)<6&&Math.abs(P.y-goal.y)<1.5)||(E.hr&&Math.hypot(P.x-goal.x,P.y-goal.y-2,P.z-goal.z)<8))finish();
 }
 // ===== 管理者アビリティ：ブラックホール／タイムスキップ =====
 const bhDist=()=>Math.hypot(P.x-goal.x,P.z-goal.z);
