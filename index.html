@@ -124,7 +124,7 @@ body.touch .sc span{font-size:24px}body.touch .sc{padding:12px 14px}
 #tgt{font-size:14px;margin:4px 0 8px}
 .ch{font-size:17px;padding:10px 16px;margin:0 10px 10px 0}
 #cd{font-size:14px;margin:4px 0 10px;line-height:1.6}
-.skb{margin-top:8px;padding:8px 12px;border-left:4px solid #ff2d55;background:rgba(255,45,85,.08)}.skh{font-weight:900;font-size:13px;letter-spacing:.05em;margin-bottom:3px}.ski{font-size:12.5px;line-height:1.7}
+#cs .st.sk{grid-column:1/-1;display:flex;gap:10px;align-items:baseline;border-left:4px solid #ff2d55;background:rgba(255,45,85,.08);padding:3px 10px}#cs .st.sk span{flex:0 0 5.5em;font-weight:900;color:#ff2d55}#cs .st.sk em{font-style:normal;font-size:11px;line-height:1.45}
 #cs{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));font-size:14px;gap:8px 22px;margin-bottom:12px}.st span{flex:0 0 7em}.bar{height:9px}
 #abs{font-size:15px;line-height:1.9;margin:0 0 14px}#abs small{font-size:12px;font-weight:700;margin-right:6px}
 #ab2{cursor:pointer;display:inline-block;font-weight:900;border:3px solid #151922;padding:12px 18px;font-size:16px;background:#f2c230}
@@ -492,8 +492,9 @@ let E={...K,spd:1,inf:0};
 const SS=[['走力',c=>c.run/2],['空中操作',c=>c.air/2.3],['空中ジャンプ',c=>c.aj/3],['軽さ',c=>(1.12-c.g)/.32],['ホップ加速',c=>c.ha/4],['ワイヤー',c=>c.hk/2],['ダッシュ',c=>c.dv*c.dd/2.4],['壁蹴り',c=>(c.wk-.9)/.5]];
 const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
 function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');{const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-const sk=E.sk?E.sk.split(/(?=[①②③④⑤])/):[],hd=sk.length&&!/^[①②③④⑤]/.test(sk[0])?sk.shift():'';
-G('cd').innerHTML='['+rn(E)+'] <b>'+esc(E.n)+'</b>　'+esc(E.d)+'　所持 '+own.size+'/'+CH.length+(E.sk?'<div class="skb"><div class="skh">★ 固有能力'+(hd?'　'+esc(hd.replace(/\s*[─-]\s*$/,'')):'')+'</div>'+sk.map(x=>'<div class="ski">'+esc(x.trim())+'</div>').join('')+'</div>':'')}G('cs').innerHTML=statsHTML(K)}
+G('cd').innerHTML='['+rn(E)+'] <b>'+esc(E.n)+'</b>　所持 '+own.size+'/'+CH.length;
+const sk=E.sk?E.sk.split(/(?=[①②③④⑤])/):[],hd=sk.length&&!/^[①②③④⑤]/.test(sk[0])?sk.shift().replace(/\s*[─-]\s*$/,'').trim():'';
+G('cs').innerHTML=statsHTML(K)+(E.sk?'<div class="st sk"><span>★'+esc(hd)+'</span><em>'+sk.map(x=>esc(x.trim())).join('　')+'</em></div>':'')}}
 G('chars').addEventListener('click',e=>{const c=e.target.closest('.ch');if(!c)return;CHI=+c.dataset.i;K=CH[CHI];sv('hien-ch',CHI);recalc();drawCh()});
 // アビリティ（キャラとは別枠：パッシブ1つ＋アクティブ1つ）
 const AB=[
