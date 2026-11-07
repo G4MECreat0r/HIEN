@@ -481,7 +481,7 @@ const CH=[
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
 {n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
 {n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',pg:[['★高速旋回',3.4],['★空中走行',1],['★速度ジャンプ',1],['★視野拡大',1]],sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速いほど視野が広がる',grip:3.4,glide:1,jb:1,tag:'SPEED ─ BEYOND MAX',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05},
-{n:'天蜘蛛',r:4,lim:1,tag:'WIRE ─ BEYOND MAX',pal:['#c8ff3a','#ff6bd6','#7a4dff'],bg:['#ffffff','#f6dcff','#b06bff','#2a0f6a'],jit:.12,d:'【期間限定】ワイヤーの力がゲージを遥かに突き抜ける。他の能力はやや高め',pg:[['★ワイヤー射程',3],['★連鎖強化',1.8]],sk:'糸術 ─ ①ワイヤーの射程が約3倍 ②着地せず繋ぎ続けるほど「連鎖」で巻き取りと放出の速度が上がる ③糸が紫に光る',hr:3,grip:1.6,run:1.15,air:1.3,aj:1,g:.98,ha:2,hc:28,hk:6,hcap:95,rel:1.6,wk:1.1,dv:1.1,dd:1.05}];
+{n:'天蜘蛛',r:4,lim:1,tag:'WIRE ─ BEYOND MAX',pal:['#c8ff3a','#ff6bd6','#7a4dff'],bg:['#ffffff','#f6dcff','#b06bff','#2a0f6a'],jit:.12,d:'【期間限定】ワイヤーの力がゲージを遥かに突き抜ける。他の能力はやや高め',pg:[['★ワイヤー射程',3],['★連鎖強化',1.4]],sk:'糸術 ─ ①ワイヤーの射程が約3倍 ②着地せず繋ぎ続けるほど「連鎖」で巻き取りと放出の速度が上がる ③糸が紫に光る',hr:3,grip:1.6,run:1.15,air:1.3,aj:1,g:.98,ha:2,hc:28,hk:6,hcap:68,rel:1.25,wk:1.1,dv:1.1,dd:1.05}];
 const LIM={ids:[CH.length-2,CH.length-1],until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
@@ -849,7 +849,7 @@ function step(dt){
     if(l>60*(E.hr||1))continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
   if(tgt&&!hookHeld)tgt.scale.setScalar(1.9);
   $('hint').style.opacity=0;
-  const cb=E.hr?1+.08*Math.min(wch,10):1;hookLine.material.color.setHex(E.hr?0xb36bff:INK);
+  const cb=E.hr?1+.05*Math.min(wch,8):1;hookLine.material.color.setHex(E.hr?0xb36bff:INK);
   if(E.hr&&wch>1&&!grounded)znT+=(znT?'　':'')+'連鎖 ×'+wch;
   if(BWIRE){if(hookHeld){if(!BH&&!bwLatch&&started){bwLatch=true;admUsed=true;startBH('bw')}}else bwLatch=false}
   if(hookHeld&&started&&!nwz&&!BWIRE){
