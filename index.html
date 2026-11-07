@@ -124,6 +124,7 @@ body.touch .sc span{font-size:24px}body.touch .sc{padding:12px 14px}
 #tgt{font-size:14px;margin:4px 0 8px}
 .ch{font-size:17px;padding:10px 16px;margin:0 10px 10px 0}
 #cd{font-size:14px;margin:4px 0 10px;line-height:1.6}
+.skb{margin-top:8px;padding:8px 12px;border-left:4px solid #ff2d55;background:rgba(255,45,85,.08)}.skh{font-weight:900;font-size:13px;letter-spacing:.05em;margin-bottom:3px}.ski{font-size:12.5px;line-height:1.7}
 #cs{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));font-size:14px;gap:8px 22px;margin-bottom:12px}.st span{flex:0 0 7em}.bar{height:9px}
 #abs{font-size:15px;line-height:1.9;margin:0 0 14px}#abs small{font-size:12px;font-weight:700;margin-right:6px}
 #ab2{cursor:pointer;display:inline-block;font-weight:900;border:3px solid #151922;padding:12px 18px;font-size:16px;background:#f2c230}
@@ -479,8 +480,9 @@ const CH=[
 {n:'神風',r:3,d:'全能力が高水準の天才',run:1.7,air:1.4,aj:2,g:.9,ha:3.4,hc:36,hk:1.2,hcap:44,rel:1.25,wk:1.2,dv:1.35,dd:1.25},
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
 {n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
-{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速度に応じて雷光の筋が走る',grip:3.4,glide:1,jb:1,run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05}];
-const LIM={id:CH.length-1,until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
+{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速いほど視野が広がる',grip:3.4,glide:1,jb:1,tag:'SPEED ─ BEYOND MAX',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05},
+{n:'天蜘蛛',r:4,lim:1,tag:'WIRE ─ BEYOND MAX',pal:['#c8ff3a','#ff6bd6','#7a4dff'],bg:['#ffffff','#f6dcff','#b06bff','#2a0f6a'],jit:.12,d:'【期間限定】ワイヤーの力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'糸術 ─ ①ワイヤーの射程が約3倍 ②着地せず繋ぎ続けるほど「連鎖」で巻き取りと放出の速度が上がる ③糸が紫に光る',hr:3,grip:1.6,run:1.15,air:1.3,aj:1,g:.98,ha:2,hc:28,hk:6,hcap:95,rel:1.6,wk:1.1,dv:1.1,dd:1.05}];
+const LIM={ids:[CH.length-2,CH.length-1],until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
 if(Q.get('coins')||/^#(coins|all)$/.test(location.hash)){coin=+Q.get('coins')||99999;sv('hien-coin',coin)}
@@ -489,7 +491,9 @@ let K=CH[CHI];
 let E={...K,spd:1,inf:0};
 const SS=[['走力',c=>c.run/2],['空中操作',c=>c.air/2.3],['空中ジャンプ',c=>c.aj/3],['軽さ',c=>(1.12-c.g)/.32],['ホップ加速',c=>c.ha/4],['ワイヤー',c=>c.hk/2],['ダッシュ',c=>c.dv*c.dd/2.4],['壁蹴り',c=>(c.wk-.9)/.5]];
 const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
-function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');G('cd').textContent='['+rn(E)+'] '+E.n+'　'+E.d+(E.sk?'　★'+E.sk:'')+'　所持 '+own.size+'/'+CH.length;G('cs').innerHTML=statsHTML(K)}
+function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');{const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+const sk=E.sk?E.sk.split(/(?=[①②③④⑤])/):[],hd=sk.length&&!/^[①②③④⑤]/.test(sk[0])?sk.shift():'';
+G('cd').innerHTML='['+rn(E)+'] <b>'+esc(E.n)+'</b>　'+esc(E.d)+'　所持 '+own.size+'/'+CH.length+(E.sk?'<div class="skb"><div class="skh">★ 固有能力'+(hd?'　'+esc(hd.replace(/\s*[─-]\s*$/,'')):'')+'</div>'+sk.map(x=>'<div class="ski">'+esc(x.trim())+'</div>').join('')+'</div>':'')}G('cs').innerHTML=statsHTML(K)}
 G('chars').addEventListener('click',e=>{const c=e.target.closest('.ch');if(!c)return;CHI=+c.dataset.i;K=CH[CHI];sv('hien-ch',CHI);recalc();drawCh()});
 // アビリティ（キャラとは別枠：パッシブ1つ＋アクティブ1つ）
 const AB=[
@@ -536,13 +540,13 @@ const RATE=[55.2,28,12,4.5,.3];
 function gRoll(guar){const w=RATE.slice();if(guar){w[0]=w[1]=0}const sum=w.reduce((a,b)=>a+b),x=Math.random()*sum;let a=0,r=0;for(;r<4;r++){a+=w[r];if(x<a)break}
   const pool=CH.map((c,i)=>i).filter(i=>CH[i].r===r&&!CH[i].lim);return pool[Math.floor(Math.random()*pool.length)]}
 function pull(n){const cost=n===1?100:900;if(coin<cost)return null;coin-=cost;const out=[];
-  for(let i=0;i<n;i++){const lo=limOn(),lm=lo&&(lpity>=LIM.pity-1||Math.random()<LIM.rate);if(lm)lpity=0;else if(lo)lpity++;pity++;const gu=pity>=10||(n===10&&i===9&&!out.some(o=>CH[o.id].r>=2)),id=lm?LIM.id:gRoll(gu);if(CH[id].r>=2)pity=0;
+  for(let i=0;i<n;i++){const lo=limOn(),lm=lo&&(lpity>=LIM.pity-1||Math.random()<LIM.rate),lu=LIM.ids.filter(q=>!own.has(q)),lp=lu.length?lu:LIM.ids;if(lm)lpity=0;else if(lo)lpity++;pity++;const gu=pity>=10||(n===10&&i===9&&!out.some(o=>CH[o.id].r>=2)),id=lm?lp[Math.floor(Math.random()*lp.length)]:gRoll(gu);if(CH[id].r>=2)pity=0;
     const dup=own.has(id),back=dup?[10,25,60,150,400][CH[id].r]:0;coin+=back;own.add(id);out.push({id,dup,back})}
   sv('hien-coin',coin);sv('hien-pity',pity);sv('hien-lpity',lpity);sv('hien-own',[...own]);return out}
 let gmode='c';let lpity=ld('hien-lpity',0);
 function updCoin(){const[c1,c10]=gmode==='c'?[100,900]:[150,1350];G('coin').textContent=coin;G('acoin').textContent='◆ '+coin;G('gcoin').textContent='◆ '+coin;
   G('g1').textContent='1回　◆'+c1;G('g10').textContent='10連　◆'+c10;G('g1').classList.toggle('off',coin<c1);G('g10').classList.toggle('off',coin<c10);
-  const gl=G('glim');if(gmode==='c'&&limOn()){const ms=LIM.until-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);gl.style.display='block';gl.innerHTML='<b>LIMITED</b>　期間限定ピックアップ「雷帝」排出中！<br>走力がゲージを遥かに突き抜ける特化型。残り '+d+'日'+h+'時間／排出率 '+(LIM.rate*100).toFixed(2)+'％／'+LIM.pity+'回以内に確定（あと '+(LIM.pity-lpity)+' 回）'}else gl.style.display='none';
+  const gl=G('glim');if(gmode==='c'&&limOn()){const ms=LIM.until-Date.now(),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);gl.style.display='block';gl.innerHTML='<b>LIMITED</b>　期間限定ピックアップ「雷帝」「天蜘蛛」排出中！<br>走力／ワイヤーがゲージを遥かに突き抜ける特化型。残り '+d+'日'+h+'時間／排出率 '+(LIM.rate*100).toFixed(2)+'％／'+LIM.pity+'回以内に確定（あと '+(LIM.pity-lpity)+' 回）'}else gl.style.display='none';
   G('gp').textContent='SR以上 確定まであと '+(10-(gmode==='c'?pity:apity))+' 回';
   G('grate').textContent=gmode==='c'?'排出率　N 55.2％／R 28％／SR 12％／SSR 4.5％／SECRET 0.3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。':'排出率　N 55％／R 30％／SR 12％／SSR 3％。10連はSR以上が1枠確定。10回連続でSR未満なら次は確定。かぶりはコインに変換。'}
 const RATEA=[55,30,12,3];
@@ -558,7 +562,7 @@ function showRes(out){const L=gmode==='c'?CH:AB;G('gres').innerHTML=out.map(o=>{
 let busy=0;
 function doPull(n){if(busy)return;const out=gmode==='c'?pull(n):pullA(n);if(!out){G('gres').innerHTML='<p>コインが足りません。ステージをクリアして集めよう。</p>';return}
   busy=1;G('gres').innerHTML='';const L=gmode==='c'?CH:AB,top=out.reduce((a,o)=>L[o.id].r+(L[o.id].lim?.5:0)>L[a.id].r+(L[a.id].lim?.5:0)?o:a),tc=L[top.id];
-  movie({n:tc.n,d:tc.d,r:tc.r,lim:tc.lim},()=>{busy=0;showRes(out);updCoin();renderOwn();drawCh();setEq()})}
+  movie(tc,()=>{busy=0;showRes(out);updCoin();renderOwn();drawCh();setEq()})}
 G('gb').onclick=()=>{G('gc').style.display='block';G('gres').innerHTML='';updCoin();renderOwn()};
 G('gx').onclick=()=>{G('gc').style.display='none';drawCh();updCoin()};
 G('g1').onclick=()=>doPull(1);G('g10').onclick=()=>doPull(10);
@@ -568,13 +572,13 @@ function movieLim(c,done){
   const cv=G('mvc'),g=cv.getContext('2d'),mv=G('mv'),dp=Math.min(devicePixelRatio||1,2);
   const W=cv.width=Math.floor(innerWidth*dp),H=cv.height=Math.floor(innerHeight*dp),cx=W/2,cy=H/2,U=Math.min(W,H)/100,R=Math.hypot(W,H)/2;
   mv.style.display='block';
-  const GOLD='#ffc400',CY='#2fd0ff',VI='#7a4dff',NV='#0b1030',T0=3.4;
+  const PL=c.pal||['#ffc400','#2fd0ff','#7a4dff'],GOLD=PL[0],CY=PL[1],VI=PL[2],NV='#0b1030',T0=3.4,BGS=c.bg||['#ffffff','#c9f0ff','#4f86ff','#1a2a8a'],JT=c.jit||1,TAG=c.tag||'SPEED ─ BEYOND MAX';
   let t0=null,last=0,fin=0,ok=0,flash=0,nextB=.4,bolts=[],sparks=[],big=0,crack=0;
   const end=()=>{if(fin)return;fin=1;mv.style.display='none';done()};
   mv.onclick=()=>{if(ok)end()};
   const ease=x=>1-Math.pow(1-Math.min(1,Math.max(0,x)),3);
   const mk2=(x,y,a,j)=>{const pts=[[x,y]];let px=x,py=y;for(let i=0;i<6;i++){px+=Math.sin(a+(Math.random()-.5))*j*.35;py+=Math.cos(a+(Math.random()-.5))*j*.35;pts.push([px,py])}return pts};
-  const mk=(x0,y0,x1,y1,j)=>{const pts=[[x0,y0]],n=16;for(let i=1;i<n;i++){const u=i/n;pts.push([x0+(x1-x0)*u+(Math.random()-.5)*j*(1-Math.abs(u-.5)*1.2),y0+(y1-y0)*u+(Math.random()-.5)*j*.25])}pts.push([x1,y1]);
+  const mk=(x0,y0,x1,y1,j)=>{j*=JT;const pts=[[x0,y0]],n=16;for(let i=1;i<n;i++){const u=i/n;pts.push([x0+(x1-x0)*u+(Math.random()-.5)*j*(1-Math.abs(u-.5)*1.2),y0+(y1-y0)*u+(Math.random()-.5)*j*.25])}pts.push([x1,y1]);
     const forks=[];for(let k=0;k<3;k++){const p=pts[3+Math.floor(Math.random()*9)],a=(Math.random()-.5)*2.2;forks.push(mk2(p[0],p[1],a,j))}return{pts,forks}};
   const stroke=(pts,w,a,dark)=>{g.lineJoin='round';g.lineCap='round';for(const[lw,col,al]of[[w*5,VI,.22*a],[w*2.3,dark?NV:CY,.7*a],[w*.9,dark?'#fff':'#fff',a]]){g.strokeStyle=col;g.globalAlpha=Math.max(0,al);g.lineWidth=lw;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke()}g.globalAlpha=1};
   const drawBolt=(b,w,a,dark)=>{stroke(b.pts,w,a,dark);for(const f of b.forks)stroke(f,w*.55,a*.8,dark)};
@@ -595,8 +599,8 @@ function movieLim(c,done){
     }else{
       if(!big){big=1;bolts.push({b:mk(cx,-U*8,cx,cy,U*10),l:.7,m:.7,w:3});flash=1.2;for(let i=0;i<220;i++){const a=Math.random()*6.283,v=(10+Math.random()*60)*U*.1;sparks.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:.6+Math.random()*1.2,s:U*(.2+Math.random()*.5)})}}
       // 明るい空：SECRETの暗転とは正反対
-      const gr=g.createRadialGradient(cx,cy,0,cx,cy,R);gr.addColorStop(0,'#ffffff');gr.addColorStop(.3,'#c9f0ff');gr.addColorStop(.7,'#4f86ff');gr.addColorStop(1,'#1a2a8a');g.fillStyle=gr;g.fillRect(0,0,W,H);
-      g.save();g.translate(cx,cy);g.rotate(t*.35);for(let i=0;i<20;i++){g.rotate(6.283/20);g.fillStyle=i%2?'rgba(255,255,255,.4)':'rgba(255,196,0,.28)';g.beginPath();g.moveTo(0,0);g.lineTo(R*1.2,-R*.07);g.lineTo(R*1.2,R*.07);g.closePath();g.fill()}g.restore();
+      const gr=g.createRadialGradient(cx,cy,0,cx,cy,R);gr.addColorStop(0,BGS[0]);gr.addColorStop(.3,BGS[1]);gr.addColorStop(.7,BGS[2]);gr.addColorStop(1,BGS[3]);g.fillStyle=gr;g.fillRect(0,0,W,H);
+      g.save();g.translate(cx,cy);g.rotate(t*.35);for(let i=0;i<20;i++){g.rotate(6.283/20);g.fillStyle=i%2?'rgba(255,255,255,.4)':(c.pal?'rgba(255,107,214,.28)':'rgba(255,196,0,.28)');g.beginPath();g.moveTo(0,0);g.lineTo(R*1.2,-R*.07);g.lineTo(R*1.2,R*.07);g.closePath();g.fill()}g.restore();
       for(let j=0;j<5;j++){const q=u-j*.16;if(q<0)continue;g.strokeStyle=j%2?'#fff':(j%4===0?GOLD:VI);g.globalAlpha=Math.max(0,1-q*.9);g.lineWidth=U*(1.6-j*.2);g.beginPath();g.arc(cx,cy,q*R*1.1,0,6.283);g.stroke()}g.globalAlpha=1;
       crack-=dt;if(crack<=0){crack=.07+Math.random()*.1;const a=Math.random()*6.283,r0=U*(16+Math.random()*10),r1=r0+U*(10+Math.random()*16),x0=cx+Math.cos(a)*r0,y0=cy+Math.sin(a)*r0*.7;bolts.push({b:{pts:[[x0,y0],...mk(x0,y0,cx+Math.cos(a+.2)*r1,cy+Math.sin(a+.2)*r1*.7,U*5).pts.slice(1)],forks:[]},l:.12,m:.12,w:.7,dark:1})}
       // 斜めの紺の帯に白抜きの名前
@@ -611,7 +615,7 @@ function movieLim(c,done){
       const gl=u<1.2&&Math.random()<.5?U*(.4+Math.random()*1.2):0;
       g.fillStyle=CY;g.fillText(c.n,-gl-U*.3,0);g.fillStyle=VI;g.fillText(c.n,gl+U*.3,0);g.shadowColor=GOLD;g.shadowBlur=U*3;g.fillStyle='#fff';g.fillText(c.n,0,0);g.restore();
       g.globalAlpha=ease((u-.5)*3);g.font='900 '+U*2.7+'px '+FN;g.lineWidth=U*.9;g.strokeStyle='#fff';g.fillStyle=NV;g.strokeText(c.d,cx,cy+ph*.85);g.fillText(c.d,cx,cy+ph*.85);g.globalAlpha=1;
-      if(u>1.4){g.font='900 '+U*4+'px '+FN;g.globalAlpha=.75+.25*Math.sin(t*9);g.lineWidth=U*1.1;g.strokeStyle='#fff';g.fillStyle=VI;g.strokeText('SPEED ─ BEYOND MAX',cx,cy+ph*1.5);g.fillText('SPEED ─ BEYOND MAX',cx,cy+ph*1.5);g.globalAlpha=1}
+      if(u>1.4){g.font='900 '+U*4+'px '+FN;g.globalAlpha=.75+.25*Math.sin(t*9);g.lineWidth=U*1.1;g.strokeStyle='#fff';g.fillStyle=VI;g.strokeText(TAG,cx,cy+ph*1.5);g.fillText(TAG,cx,cy+ph*1.5);g.globalAlpha=1}
     }
     bolts=bolts.filter(o=>{o.l-=dt;if(o.l<=0)return false;drawBolt(o.b,U*(o.w||1.6)*.5,o.l/o.m,o.dark);return true});
     for(const p of sparks){p.vy+=U*.004;p.x+=p.vx;p.y+=p.vy;p.l-=dt;if(p.l<=0)continue;g.globalAlpha=Math.min(1,p.l);g.strokeStyle=Math.random()<.5?'#fff':GOLD;g.lineWidth=p.s*.5;g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x-p.vx*1.6,p.y-p.vy*1.6);g.stroke()}
@@ -695,7 +699,7 @@ const hookLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THRE
 hookLine.frustumCulled=false;hookLine.visible=false;S.add(hookLine);
 // 状態
 const P={x:0,y:0,z:0,vx:0,vy:0,vz:0,ride:null},HW=.35;let HH=1.8;
-let glideT=0,prevGr=false,eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
+let wch=0,glideT=0,prevGr=false,eyeH=1.6,hop=0,landT=0,runT=0,fly=0,dashJ=0,yaw=0,pitch=0,grounded=false,coyote=0,jbuf=0,airJump=E.aj,dashes=2,dashT=0,wallT=0,wnx=0,wnz=0,wallSide=0,boostT=0,padCD=0,gt=0;
 let hookT=null,hookHeld=false,cp=0,t=0,running=false,started=false,finished=false,roll=0,fov=78,rec=[],znT='',admUsed=false,BH=null,SN=null,admReady=false;
 const keys={};
 const $=id=>document.getElementById(id),pips=[...document.querySelectorAll('.pip')];
@@ -821,7 +825,7 @@ function step(dt){
     // 重力（壁に張り付くと緩やか）
     const onWall=wallT>0&&!grounded&&P.vy<0;
     if(E.glide){const hs=Math.hypot(P.vx,P.vz);if(prevGr&&!grounded&&hs>20&&P.vy<=.5&&!hookT)glideT=Math.min(.6,hs/110);if(grounded||P.vy>.5||hookT)glideT=0}else glideT=0;
-    prevGr=grounded;
+    prevGr=grounded;if(grounded&&!hookT)wch=0;
     if(glideT>0&&!onWall){glideT-=dt;P.vy=0}else P.vy-=(onWall?7:32*SG.gv*E.g)*dt;
     if(onWall&&P.vy<-4)P.vy=-4;
   }
@@ -842,24 +846,26 @@ function step(dt){
   let best=.9;
   for(const a of anchors){a.rotation.y+=dt;a.scale.setScalar(1);
     const dx=a.position.x-ex,dy=a.position.y-ey,dz=a.position.z-ez,l=Math.hypot(dx,dy,dz);
-    if(l>60)continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
+    if(l>60*(E.hr||1))continue;const dt2=(dx*cx+dy*cy+dz*cz)/l;if(dt2>best){best=dt2;tgt=a}}
   if(tgt&&!hookHeld)tgt.scale.setScalar(1.9);
   $('hint').style.opacity=0;
+  const cb=E.hr?1+.08*Math.min(wch,10):1;hookLine.material.color.setHex(E.hr?0xb36bff:INK);
+  if(E.hr&&wch>1&&!grounded)znT+=(znT?'　':'')+'連鎖 ×'+wch;
   if(BWIRE){if(hookHeld){if(!BH&&!bwLatch&&started){bwLatch=true;admUsed=true;startBH('bw')}}else bwLatch=false}
   if(hookHeld&&started&&!nwz&&!BWIRE){
     if(!hookT){let H=null;
       if(tgt)H=tgt.position.clone();
-      else{let bt=75;for(const b of boxes){if(b.st===2)continue;const t2=rayBox(ex,ey,ez,cx,cy,cz,b);if(t2!==null&&t2<bt)bt=t2}if(bt<75)H=new THREE.Vector3(ex+cx*bt,ey+cy*bt,ez+cz*bt)}
-      if(H){hookT={position:H,L:H.distanceTo(new THREE.Vector3(ex,ey,ez)),age:0};dashes=2;airJump=E.aj}}
-  }else if(hookT){const h=Math.hypot(P.vx,P.vy,P.vz);if(hookT.age>.25&&h>12){const f=Math.min(h*E.rel,E.hcap)/h;P.vx*=f;P.vy*=f;P.vz*=f;showMsg('リリース！')}hookT=null}
+      else{const RG=75*(E.hr||1);let bt=RG;for(const b of boxes){if(b.st===2)continue;const t2=rayBox(ex,ey,ez,cx,cy,cz,b,RG);if(t2!==null&&t2<bt)bt=t2}if(bt<RG)H=new THREE.Vector3(ex+cx*bt,ey+cy*bt,ez+cz*bt)}
+      if(H){hookT={position:H,L:H.distanceTo(new THREE.Vector3(ex,ey,ez)),age:0};dashes=2;airJump=E.aj;if(E.hr)wch=grounded?1:wch+1}}
+  }else if(hookT){const h=Math.hypot(P.vx,P.vy,P.vz);if(hookT.age>.25&&h>12){const f=Math.min(h*E.rel*cb,E.hcap*cb)/h;P.vx*=f;P.vy*=f;P.vz*=f;showMsg('リリース！')}hookT=null}
   if(hookT){
     const dx=hookT.position.x-ex,dy=hookT.position.y-ey,dz=hookT.position.z-ez,l=Math.hypot(dx,dy,dz);
     if(l<3){P.vy=Math.max(P.vy,10);hookT=null;hookHeld=false}
     else{const nx=dx/l,ny=dy/l,nz=dz/l;hookT.L=Math.max(2.5,Math.min(hookT.L,l)-10*E.hk*dt);
-      hookT.age+=dt;const a=16*E.hk*dt;if(wl>0){P.vx+=wx*16*E.hk*dt;P.vz+=wz*16*E.hk*dt}P.vx+=nx*a;P.vy+=ny*a;P.vz+=nz*a;
+      hookT.age+=dt;const a=16*E.hk*cb*dt;if(wl>0){P.vx+=wx*16*E.hk*dt;P.vz+=wz*16*E.hk*dt}P.vx+=nx*a;P.vy+=ny*a;P.vz+=nz*a;
       const vn=P.vx*nx+P.vy*ny+P.vz*nz;
       if(l>hookT.L){const c=(l-hookT.L)*Math.min(1,dt*10);P.x+=nx*c;P.y+=ny*c;P.z+=nz*c;if(vn<0){P.vx-=nx*vn;P.vy-=ny*vn;P.vz-=nz*vn}}
-      const sp=Math.hypot(P.vx,P.vy,P.vz);if(sp>E.hcap){const k=E.hcap/sp;P.vx*=k;P.vy*=k;P.vz*=k}
+      const sp=Math.hypot(P.vx,P.vy,P.vz);if(sp>E.hcap*cb){const k=E.hcap*cb/sp;P.vx*=k;P.vy*=k;P.vz*=k}
       const pa=hookLine.geometry.attributes.position;pa.setXYZ(0,P.x,P.y+1.2,P.z);pa.setXYZ(1,hookT.position.x,hookT.position.y,hookT.position.z);pa.needsUpdate=true;hookLine.visible=true}
   }
   if(dashing&&dashT-dt<=0){const s=Math.hypot(P.vx,P.vy,P.vz);if(s>26*E.dv){const k=26*E.dv/s;P.vx*=k;P.vy*=k;P.vz*=k}}
@@ -955,14 +961,14 @@ if(ADMIN){
   const TG=[['god','無敵','被弾・ボスに捕まっても何も起きない'],['aj','無限空中ジャンプ','空中で何度でもジャンプできる'],['inf','ダッシュ無制限','ダッシュ回数の制限なし']];
   const SL=[['spd','移動速度',.5,3,.1],['g','重力',0,1.5,.05],['slow','ゲーム速度（スロー）',.1,1,.05]];
   const BT=[['coin','コイン +10000','ガチャ用'],['stg','全ステージ解放','ランクに関係なく全て開く'],['all','全キャラ・全アビリティ解放','ガチャなしで全部入手'],['rec','ベスト・ゴーストを初期化','全ステージの記録を削除'],['rst','チートを全てOFF','数値も初期値に戻す']];
-  const MV=[['0','N',''],['1','R',''],['2','SR',''],['3','SSR',''],['4','SECRET','飛燕・零'],['lim','LIMITED','雷帝（期間限定）']];
+  const MV=[['0','N',''],['1','R',''],['2','SR',''],['3','SSR',''],['4','SECRET','飛燕・零'],['lim0','LIMITED','雷帝'],['lim1','LIMITED','天蜘蛛']];
   const draw=()=>{pa.innerHTML='<div class="lbl2">ADMIN　チート（使うとその走りは記録対象外）</div>'+TG.map(([k,n,d])=>'<span class="mc'+(ADM[k]?' on':'')+'" data-t="'+k+'"><b>'+n+'</b><small>'+d+'</small><em>'+(ADM[k]?'ON':'OFF')+'</em></span>').join('')
     +'<div class="lbl2">数値</div>'+SL.map(([k,n,mn,mx,st])=>'<div style="margin:6px 0;font-weight:900">'+n+'　<span id="av-'+k+'">×'+(+ADM[k]).toFixed(2)+'</span><br><input type="range" data-k="'+k+'" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+ADM[k]+'" style="width:100%;max-width:420px"></div>').join('')
     +'<div class="lbl2">ツール</div>'+BT.map(([k,n,d])=>'<span class="mc" data-b="'+k+'"><b>'+n+'</b><small>'+d+'</small></span>').join('')+'<div class="lbl2">演出確認（ガチャ演出のプレビュー）</div>'+MV.map(([k,n,d])=>'<span class="mc" data-m="'+k+'"><b>'+n+'</b><small>'+d+'</small></span>').join('')+'<div id="amsg2" style="font-weight:900;margin-top:8px"></div>'};
   const note=m=>{G('amsg2').textContent=m};
   pa.addEventListener('click',e=>{const c=e.target.closest('.mc');if(!c)return;
     if(c.dataset.t){ADM[c.dataset.t]=ADM[c.dataset.t]?0:1;svA();draw();return}
-    if(c.dataset.m!==undefined){const i=c.dataset.m==='lim'?LIM.id:CH.findIndex(x=>x.r===+c.dataset.m&&!x.lim);if(i>=0)movie(i,()=>{});return}
+    if(c.dataset.m!==undefined){const i=c.dataset.m.startsWith('lim')?LIM.ids[+c.dataset.m.slice(3)]:CH.findIndex(x=>x.r===+c.dataset.m&&!x.lim);if(i>=0)movie(i,()=>{});return}
     const b=c.dataset.b;
     if(b==='coin'){coin+=10000;sv('hien-coin',coin);updCoin();note('コイン +10000（所持 '+coin+'）')}
     else if(b==='stg'){try{for(let i=0;i<STG.length;i++)localStorage.setItem('hien-rk'+i,'S')}catch(x){}__restart(location.search||'?')}
@@ -986,7 +992,7 @@ function hdOn(on){HD.on=on;G('hdv').classList.toggle('on',on)}
 function hdFx(dt){
   if(HD.on&&!(AA&&AA.fx==='hd'&&abT>0))hdOn(false);
   HD.a+=((HD.on?1:0)-HD.a)*Math.min(1,dt*5);if(!HD.on&&HD.a<.01)HD.a=0;
-  const sp=Math.hypot(P.vx,P.vz);HD.s=(E.grip&&started&&!finished&&!BH&&!SN)?Math.max(0,Math.min(1,(sp-35)/45))*.65:0;const aa=Math.max(HD.a,HD.s);
+  const sp=Math.hypot(P.vx,P.vz);HD.s=(E.grip&&started&&!finished&&!BH&&!SN)?Math.max(0,Math.min(1,(sp-35)/45))*.65:0;const aa=HD.a;
   const vis=aa>.01;hdTun.visible=hdLines.visible=vis;if(!vis)return;
   HD.t+=dt;hdTun.material.uniforms.uT.value=HD.t;hdTun.material.uniforms.uA.value=aa;hdLines.material.opacity=aa;
   const v=(70+Math.min(60,sp*2.4))*(.6+.4*aa);
