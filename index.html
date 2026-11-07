@@ -480,8 +480,8 @@ const CH=[
 {n:'神風',r:3,d:'全能力が高水準の天才',run:1.7,air:1.4,aj:2,g:.9,ha:3.4,hc:36,hk:1.2,hcap:44,rel:1.25,wk:1.2,dv:1.35,dd:1.25},
 {n:'天狗',r:3,d:'ワイヤーを極めた空の覇者',run:1.2,air:1.6,aj:2,g:.88,ha:2.2,hc:29,hk:1.8,hcap:52,rel:1.45,wk:1.25,dv:1.2,dd:1.2},
 {n:'飛燕・零',r:4,d:'全ての能力が、誰よりも強い',run:2,air:2.3,aj:3,g:.8,ha:4,hc:40,hk:2,hcap:58,rel:1.6,wk:1.4,dv:1.6,dd:1.5},
-{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速いほど視野が広がる',grip:3.4,glide:1,jb:1,tag:'SPEED ─ BEYOND MAX',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05},
-{n:'天蜘蛛',r:4,lim:1,tag:'WIRE ─ BEYOND MAX',pal:['#c8ff3a','#ff6bd6','#7a4dff'],bg:['#ffffff','#f6dcff','#b06bff','#2a0f6a'],jit:.12,d:'【期間限定】ワイヤーの力がゲージを遥かに突き抜ける。他の能力はやや高め',sk:'糸術 ─ ①ワイヤーの射程が約3倍 ②着地せず繋ぎ続けるほど「連鎖」で巻き取りと放出の速度が上がる ③糸が紫に光る',hr:3,grip:1.6,run:1.15,air:1.3,aj:1,g:.98,ha:2,hc:28,hk:6,hcap:95,rel:1.6,wk:1.1,dv:1.1,dd:1.05}];
+{n:'雷帝',r:4,lim:1,d:'【期間限定】走力がゲージを遥かに突き抜ける。他の能力はやや高め',pg:[['★高速旋回',3.4],['★空中走行',1],['★速度ジャンプ',1],['★視野拡大',1]],sk:'雷脚 ─ ①高速でも思い通りに曲がれる ②地面を離れても雷が足場になり少しの間 宙を走れる ③速いほど高く遠くへ跳べる ④速いほど視野が広がる',grip:3.4,glide:1,jb:1,tag:'SPEED ─ BEYOND MAX',run:7,air:1.2,aj:1,g:.96,ha:2,hc:130,hk:1.1,hcap:42,rel:1.2,wk:1.12,dv:1.1,dd:1.05},
+{n:'天蜘蛛',r:4,lim:1,tag:'WIRE ─ BEYOND MAX',pal:['#c8ff3a','#ff6bd6','#7a4dff'],bg:['#ffffff','#f6dcff','#b06bff','#2a0f6a'],jit:.12,d:'【期間限定】ワイヤーの力がゲージを遥かに突き抜ける。他の能力はやや高め',pg:[['★ワイヤー射程',3],['★連鎖強化',1.8]],sk:'糸術 ─ ①ワイヤーの射程が約3倍 ②着地せず繋ぎ続けるほど「連鎖」で巻き取りと放出の速度が上がる ③糸が紫に光る',hr:3,grip:1.6,run:1.15,air:1.3,aj:1,g:.98,ha:2,hc:28,hk:6,hcap:95,rel:1.6,wk:1.1,dv:1.1,dd:1.05}];
 const LIM={ids:[CH.length-2,CH.length-1],until:new Date('2026-11-30T23:59:59+09:00').getTime(),rate:.0005,pity:1500},limOn=()=>Date.now()<LIM.until;
 const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const own=new Set(ld('hien-own',[0]));let coin=ld('hien-coin',500),pity=ld('hien-pity',0);
@@ -490,11 +490,10 @@ let CHI=ld('hien-ch',0);if(!own.has(CHI))CHI=0;
 let K=CH[CHI];
 let E={...K,spd:1,inf:0};
 const SS=[['走力',c=>c.run/2],['空中操作',c=>c.air/2.3],['空中ジャンプ',c=>c.aj/3],['軽さ',c=>(1.12-c.g)/.32],['ホップ加速',c=>c.ha/4],['ワイヤー',c=>c.hk/2],['ダッシュ',c=>c.dv*c.dd/2.4],['壁蹴り',c=>(c.wk-.9)/.5]];
-const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
+const statsHTML=c=>{const vs=SS.map(([l,f])=>[l,f(c)]).concat(c.pg||[]),any=vs.some(x=>x[1]>1.001);return vs.map(([l,v])=>{const ov=v>1.001;return '<div class="st'+(any?' ovs':'')+'"><span>'+l+(ov?'<b class="ob">▲'+Math.round(v*100)+'%</b>':'')+'</span><div class="bar'+(ov?' ov':'')+'"'+(ov?' style="--ov:'+Math.min(.5,v-1).toFixed(2)+'"':'')+'><i style="width:'+Math.round(Math.max(.04,Math.min(1,v))*100)+'%;background:'+RC[c.r]+'"></i></div>'+'</div>'}).join('')};
 function drawCh(){G('chars').innerHTML=[...own].sort((a,b)=>a-b).map(i=>'<span class="ch'+(i===CHI?' on':'')+'" data-i="'+i+'" style="border-color:'+RC[CH[i].r]+'"><i style="font-style:normal;font-size:10px;margin-right:5px;color:'+RC[CH[i].r]+'">'+rn(CH[i])+'</i>'+CH[i].n+'</span>').join('');{const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 G('cd').innerHTML='['+rn(E)+'] <b>'+esc(E.n)+'</b>　所持 '+own.size+'/'+CH.length;
-const sk=E.sk?E.sk.split(/(?=[①②③④⑤])/):[],hd=sk.length&&!/^[①②③④⑤]/.test(sk[0])?sk.shift().replace(/\s*[─-]\s*$/,'').trim():'';
-G('cs').innerHTML=statsHTML(K)+(E.sk?'<div class="st sk"><span>★'+esc(hd)+'</span><em>'+sk.map(x=>esc(x.trim())).join('　')+'</em></div>':'')}}
+G('cs').innerHTML=statsHTML(K)}}
 G('chars').addEventListener('click',e=>{const c=e.target.closest('.ch');if(!c)return;CHI=+c.dataset.i;K=CH[CHI];sv('hien-ch',CHI);recalc();drawCh()});
 // アビリティ（キャラとは別枠：パッシブ1つ＋アクティブ1つ）
 const AB=[
